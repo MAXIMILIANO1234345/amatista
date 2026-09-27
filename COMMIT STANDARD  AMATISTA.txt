@@ -1,0 +1,47 @@
+======================================================
+COMMIT STANDARD - AMATISTA MONOREPO
+======================================================
+
+1. MANDATORY STRUCTURE
+------------------------------------------------------
+Exact format: type(scope): description
+
+* type: The nature of the change (see section 2).
+* scope: The monorepo domain being modified (see section 3).
+* description: Action in imperative mood, lowercase, and no period at the end.
+
+2. ALLOWED TYPES
+------------------------------------------------------
+* feat:     Adds a new feature or functionality.
+* fix:      Resolves an error or bug in the code.
+* docs:     Modifies documentation only (txt, md files, images).
+* refactor: Reorganizes code without adding functions or fixing bugs.
+* chore:    Maintenance, library updates, or system configuration.
+
+3. SCOPES (PROJECT DOMAINS)
+------------------------------------------------------
+* (pwa)  -> Everything related to the interface, Service Worker, and A-Frame.
+* (api)  -> Python server routes and logic (Oracle).
+* (db)   -> SQL schemas and database connections.
+* (ia)   -> Connection scripts for Ollama and local prompts.
+* (repo) -> Global files (.gitignore, README, restructuring). 4. PRACTICAL EXAMPLES BY STRUCTURE
+------------------------------------------------------
+[FEAT]
+feat(pwa): implement 3D viewer using A-Frame on the main screen
+feat(db): create relational table for student progress
+
+[FIX]
+fix(api): fix connection error when sending student data
+fix(pwa): fix background color in the manifest's dark theme
+
+[DOCS]
+docs(repo): add commit rules to the documentation folder
+docs(ai): update data flow diagram for the virtual tutor
+
+[REFACTOR]
+refactor(pwa): separate IndexedDB logic into a standalone file
+refactor(api): reorganize route functions into separate modules
+
+[CHORE]
+chore(ai): update versions in the virtual environment's requirements.txt
+chore(repo): create base directories to isolate frontend from backend
