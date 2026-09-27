@@ -1,0 +1,44 @@
+======================================================
+DOCUMENTACIÓN DEL PROYECTO: AMATISTA PWA
+======================================================
+Descripción: Plataforma educativa enfocada en el flujo 
+de diseño 3D desde Blender hacia A-Frame (WebXR).
+
+1. ARQUITECTURA DE INFRAESTRUCTURA
+------------------------------------------------------
+- Frontend (PWA): Alojado y desplegado vía Cloudflare Pages.
+- Backend y BD: Oracle Free Tier (Python/SQL) para progreso y metadatos.
+- IA Tutor (Local): PC de escritorio ejecutando Ollama, conectada vía túnel seguro.
+- Almacenamiento Pesado: Cuenta institucional para modelos .glb y .blend.
+- Control de Versiones: GitHub (vía SSH).
+
+2. ESTRUCTURA DE LA PLATAFORMA (SECCIONES)
+------------------------------------------------------
+1. Dashboard: Pantalla principal, continuar lección, progreso global y estado de red (Online/Offline).
+2. Ruta de Aprendizaje: Temario lineal (1. Blender, 2. Texturas/Exportación, 3. A-Frame, 4. Interactividad). Botones de descarga por módulo.
+3. Aula Interactiva: 
+   - Móvil: Pestañas. 
+   - Escritorio: Pantalla dividida (Teoría + Visor 3D/Código + Chat IA).
+4. Gestor Offline: Control de almacenamiento local (IndexedDB) y borrado de caché.
+5. Perfil y Ajustes: Datos del estudiante, preferencias visuales, sincronización manual.
+
+3. IDENTIDAD VISUAL (UI/UX)
+------------------------------------------------------
+Concepto: 
+"Cristal de amatista Low Poly". Geometría, vértices y caras planas, reflejando el entorno 3D optimizado para web.
+
+Paleta de Colores (Dark Mode Nativo):
+- Fondo Base: #121212 (Negro profundo, optimizado para pantallas OLED).
+- Superficies/Tarjetas: #1E1E1E (Gris oscuro).
+- Color Principal (Amatista): #9B59B6 (Botones de acción, barra de progreso).
+- Acento (Neón): #00E5FF (Cian para resaltar etiquetas de código o IA).
+- Texto Principal: #E0E0E0 (Gris claro para reducir fatiga visual).
+
+Tipografía:
+- Interfaz y Teoría: Outfit o Inter (Sans-serif, geométrica, limpia).
+- Código (HTML/A-Frame): Fira Code o JetBrains Mono (Monoespaciada con ligaduras).
+
+Estilo de Componentes:
+- Bordes: Redondeado sutil (8px).
+- Sombras: Estilo "Flat Dark", sin sombras excesivas para maximizar rendimiento de renderizado.
+- Estados: Borde con resplandor morado (#9B59B6) para indicar que una lección está disponible en almacenamiento local.
