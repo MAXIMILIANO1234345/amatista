@@ -1,0 +1,40 @@
+======================================================
+REPORTE DE COMMIT: FEAT(PWA) APP SHELL
+======================================================
+
+1. RESUMEN DE LA IMPLEMENTACIÓN
+------------------------------------------------------
+Se migró el frontend de un entorno estático (HTML/CSS puro) a una Single Page Application (SPA) reactiva y moderna. Esto permite que la plataforma actualice la interfaz sin recargar la página, aislando el motor 3D de la lógica de usuario.
+
+2. DEPENDENCIAS INSTALADAS (STACK FRONTEND)
+------------------------------------------------------
+* Vite: Motor de empaquetado ultrarrápido.
+* React: Librería central para la creación de interfaces por componentes.
+* Tailwind CSS + @tailwindcss/postcss: Motor de estilos utilitarios (App Shell oscuro).
+* Zustand: Preparado para la gestión del estado global (Online/Offline).
+* Dexie.js: Preparado para la base de datos local (IndexedDB).
+* A-Frame (CDN): Motor WebXR incrustado para renderizar objetos .glb y geometrías.
+
+3. REESTRUCTURACIÓN DE ARCHIVOS
+------------------------------------------------------
+* Los estáticos de la PWA (manifest.json, sw.js) se movieron a /public/.
+* index.html actúa ahora como el punto de montaje del <div id="root"> de React.
+* App.jsx contiene la maquetación principal dividida en paneles.
+
+4. DIAGRAMA DE ARQUITECTURA VISUAL (APP.JSX)
+------------------------------------------------------
+ ____________________________________________________
+|  [ HEADER ] AMATISTA.PWA             Estado: Online|
+|====================================================|
+|                  |                                 |
+|  [ SIDEBAR IA ]  |        [ VISOR WEBXR ]          |
+|                  |                                 |
+|  Esperando       |        <a-scene embedded>       |
+|  conexión con    |          - Caja (Amatista)      |
+|  túnel Ollama... |          - Esfera (Neón)        |
+|                  |          - Cilindro             |
+|                  |        </a-scene>               |
+|                  |                                 |
+|__________________|_________________________________|
+
+El Virtual DOM de React controla el Header y el Sidebar, mientras que A-Frame toma control absoluto y directo del Canvas WebGL dentro del Visor WebXR para garantizar 60fps sin interferencias.
