@@ -1,0 +1,549 @@
+AMATISTA PWA
+RECOMENDACIONES DE ARQUITECTURA Y ORGANIZACIÓN DEL PROYECTO
+===========================================================
+
+1. VISIÓN GENERAL
+-----------------
+
+Amatista está bien encaminado como una plataforma educativa orientada al aprendizaje práctico de creación 3D para web/XR.
+
+La idea central puede resumirse así:
+
+Blender
+  ↓
+Exportación de modelos GLB
+  ↓
+A-Frame / WebXR
+  ↓
+Experiencia educativa interactiva
+  ↓
+Funcionamiento offline mediante PWA
+  ↓
+Sincronización con backend
+  ↓
+Tutor IA como capa adicional
+
+La organización actual del repositorio tiene sentido y no necesita una reestructuración grande en este momento.
+
+Estructura actual:
+
+amatista/
+├── frontend/
+├── backend/
+├── ai_tutor/
+└── docs/
+
+Esta separación es adecuada porque cada carpeta representa una responsabilidad distinta del sistema.
+
+
+2. PRINCIPIO ARQUITECTÓNICO PRINCIPAL
+-------------------------------------
+
+La recomendación más importante es que Amatista siga un enfoque:
+
+LOCAL PRIMERO, SERVICIOS EXTERNOS DESPUÉS.
+
+La PWA debe poder realizar las funciones educativas principales aunque no tenga conexión a Internet.
+
+Arquitectura recomendada:
+
+Usuario
+  ↓
+PWA
+  ↓
+IndexedDB
+  ↓
+Contenido educativo disponible
+  ↓
+Progreso almacenado localmente
+
+Cuando existe conexión:
+  ↓
+Backend
+  ↓
+Sincronización del progreso
+
+Cuando el Tutor IA está disponible:
+  ↓
+Ollama
+  ↓
+Asistencia contextual
+
+El funcionamiento de la plataforma no debería depender completamente del backend ni del Tutor IA.
+
+
+3. ESTRUCTURA GENERAL DEL SISTEMA
+---------------------------------
+
+                    ┌─────────────────┐
+                    │    AI Tutor     │
+                    │     Ollama      │
+                    └────────▲────────┘
+                             │
+                             │
+┌─────────────────────────────────────────────┐
+│                    PWA                      │
+│                                             │
+│ Dashboard                                   │
+│ Ruta de aprendizaje                         │
+│ Lecciones                                   │
+│ Visor A-Frame / WebXR                       │
+│ IndexedDB                                   │
+│ Service Worker                              │
+│ Gestión Offline                             │
+└─────────────────────▲───────────────────────┘
+                      │
+                 sincronización
+                      │
+              ┌───────┴────────┐
+              │    Backend     │
+              │   Python API   │
+              │   Oracle SQL   │
+              └────────────────┘
+
+
+4. RESPONSABILIDAD DE CADA MÓDULO
+---------------------------------
+
+4.1 FRONTEND
+
+Debe ser el núcleo principal de Amatista.
+
+Responsabilidades:
+
+- Interfaz del estudiante.
+- Dashboard.
+- Ruta de aprendizaje.
+- Lecciones.
+- Visor 3D con A-Frame.
+- Experiencias WebXR.
+- Estado Online / Offline.
+- Descarga de contenido.
+- IndexedDB.
+- Service Worker.
+- Progreso local.
+- Sincronización con backend.
+- Comunicación con el Tutor IA.
+
+La plataforma educativa debería seguir funcionando aunque el backend no esté disponible.
+
+
+4.2 BACKEND
+
+Debe actuar principalmente como servicio de persistencia y sincronización.
+
+Responsabilidades:
+
+- API.
+- Usuarios.
+- Progreso del estudiante.
+- Sincronización de progreso.
+- Metadatos de cursos.
+- Registro de dispositivos o sesiones.
+- Persistencia en Oracle.
+- Validaciones del servidor.
+
+El backend no debería convertirse en un requisito para visualizar contenido que ya está descargado localmente.
+
+
+4.3 AI_TUTOR
+
+Debe ser una capa adicional de asistencia.
+
+Responsabilidades:
+
+- Comunicación con Ollama.
+- Prompts del sistema.
+- Contexto educativo.
+- Contexto de la lección actual.
+- Explicaciones.
+- Ayuda técnica.
+- Resolución de dudas.
+- Orientación paso a paso.
+
+La plataforma debería seguir funcionando aunque Ollama no esté disponible.
+
+
+4.4 DOCS
+
+Debe contener la documentación técnica y las decisiones del proyecto.
+
+Recomendaciones:
+
+docs/
+├── arquitectura.md
+├── convenciones_commits.md
+├── offline-first.md
+├── api.md
+├── base_datos.md
+├── tutor_ia.md
+├── decisiones/
+└── diagramas/
+
+La carpeta docs puede convertirse en la referencia técnica principal del proyecto.
+
+
+5. ESTRUCTURA FUTURA DEL FRONTEND
+---------------------------------
+
+Cuando el frontend crezca, podría evolucionar hacia:
+
+frontend/
+├── public/
+│   ├── manifest.json
+│   ├── sw.js
+│   └── icons/
+│
+├── src/
+│   ├── components/
+│   │   ├── Navbar/
+│   │   ├── NetworkStatus/
+│   │   ├── ProgressBar/
+│   │   └── Layout/
+│   │
+│   ├── pages/
+│   │   ├── Dashboard/
+│   │   ├── LearningPath/
+│   │   ├── Classroom/
+│   │   ├── OfflineManager/
+│   │   └── Profile/
+│   │
+│   ├── features/
+│   │   ├── lessons/
+│   │   ├── progress/
+│   │   ├── xr/
+│   │   ├── offline/
+│   │   └── tutor/
+│   │
+│   ├── services/
+│   │   ├── api.js
+│   │   ├── sync.js
+│   │   └── tutor.js
+│   │
+│   ├── storage/
+│   │   ├── indexedDB.js
+│   │   └── cache.js
+│   │
+│   ├── hooks/
+│   ├── utils/
+│   ├── App.jsx
+│   └── main.jsx
+│
+└── package.json
+
+No es necesario crear todas estas carpetas inmediatamente.
+
+La estructura debe aparecer conforme exista código que realmente la necesite.
+
+
+6. ESTRUCTURA FUTURA DEL BACKEND
+--------------------------------
+
+backend/
+├── main.py
+├── requirements.txt
+├── api/
+│   ├── routes/
+│   ├── schemas/
+│   └── dependencies/
+│
+├── services/
+│   ├── progress_service.py
+│   ├── sync_service.py
+│   └── user_service.py
+│
+├── database/
+│   ├── connection.py
+│   ├── models/
+│   └── migrations/
+│
+├── config/
+└── tests/
+
+La lógica de negocio debería separarse de las rutas HTTP.
+
+
+7. ESTRUCTURA FUTURA DEL TUTOR IA
+---------------------------------
+
+ai_tutor/
+├── prompts/
+│   ├── system.txt
+│   ├── blender.txt
+│   ├── aframe.txt
+│   └── debugging.txt
+│
+├── context/
+│   ├── lesson_context.py
+│   └── course_context.py
+│
+├── services/
+│   └── ollama_client.py
+│
+├── main.py
+└── tests/
+
+El Tutor IA debería recibir contexto específico de la lección actual en lugar de responder únicamente con prompts genéricos.
+
+
+8. FLUJO PRINCIPAL QUE DEBERÍA GUIAR EL DESARROLLO
+---------------------------------------------------
+
+El objetivo principal debería ser conseguir primero este recorrido completo:
+
+1. El estudiante abre Amatista.
+2. Visualiza su ruta de aprendizaje.
+3. Descarga una lección.
+4. El contenido se guarda localmente.
+5. El estudiante pierde la conexión.
+6. La lección sigue disponible.
+7. Puede visualizar el modelo 3D.
+8. Puede realizar la actividad.
+9. El progreso se guarda en IndexedDB.
+10. Recupera la conexión.
+11. La aplicación detecta conectividad.
+12. El progreso se sincroniza con el backend.
+13. Opcionalmente el estudiante consulta al Tutor IA.
+
+Cuando este flujo funcione de extremo a extremo, Amatista tendrá un MVP técnicamente sólido.
+
+
+9. PRIORIDADES DE DESARROLLO
+----------------------------
+
+PRIORIDAD 1
+PWA OFFLINE REAL
+
+- manifest.json.
+- Service Worker.
+- Caché de App Shell.
+- IndexedDB.
+- Detección de conexión.
+- Descarga de lecciones.
+- Gestión de almacenamiento.
+
+
+PRIORIDAD 2
+EXPERIENCIA EDUCATIVA
+
+- Dashboard.
+- Ruta de aprendizaje.
+- Lecciones.
+- Progreso.
+- Navegación.
+- Actividades.
+
+
+PRIORIDAD 3
+VISOR 3D / WEBXR
+
+- Integración A-Frame estable.
+- Carga de archivos GLB.
+- Escenas reutilizables.
+- Interacción con objetos.
+- Ejercicios prácticos.
+
+
+PRIORIDAD 4
+BACKEND
+
+- API mínima.
+- Persistencia del progreso.
+- Sincronización.
+- Usuarios.
+- Oracle.
+
+
+PRIORIDAD 5
+TUTOR IA
+
+- Cliente Ollama.
+- Prompts.
+- Contexto de la lección.
+- Historial de conversación.
+- Manejo de errores.
+- Disponibilidad del servicio.
+
+
+10. RECOMENDACIONES SOBRE LA ORGANIZACIÓN ACTUAL
+------------------------------------------------
+
+La estructura general actual debería mantenerse.
+
+No es recomendable reorganizar continuamente el repositorio.
+
+La arquitectura actual ya proporciona suficiente separación entre responsabilidades.
+
+En este momento el mayor beneficio vendrá de implementar funcionalidades reales, no de crear más carpetas.
+
+Regla recomendada:
+
+NO CREAR UNA CAPA NUEVA HASTA QUE EXISTA UNA NECESIDAD REAL.
+
+Ejemplo:
+
+No crear veinte componentes antes de tener varias pantallas.
+
+No crear múltiples servicios de backend antes de tener endpoints reales.
+
+No crear una arquitectura compleja del Tutor IA antes de tener una comunicación básica con Ollama.
+
+
+11. RECOMENDACIONES PARA EL REPOSITORIO
+---------------------------------------
+
+Agregar posteriormente:
+
+- GitHub Actions.
+- Lint automático.
+- Build automático.
+- Tests.
+- README principal mejorado.
+- Capturas de pantalla.
+- Diagrama de arquitectura.
+- Guía de instalación.
+- Roadmap.
+- Estado de cada módulo.
+- CONTRIBUTING.md.
+
+También sería conveniente mantener el uso de commits estructurados:
+
+feat(pwa):
+fix(pwa):
+feat(api):
+fix(api):
+feat(db):
+feat(ia):
+docs(repo):
+chore(repo):
+
+La convención actual ayuda a mantener un historial comprensible.
+
+
+12. README PRINCIPAL RECOMENDADO
+--------------------------------
+
+El README principal debería explicar rápidamente:
+
+1. Qué es Amatista.
+2. Qué problema intenta resolver.
+3. Cómo funciona.
+4. Stack tecnológico.
+5. Arquitectura.
+6. Estado actual.
+7. Instalación.
+8. Roadmap.
+9. Capturas de pantalla.
+10. Licencia.
+
+Una persona que visite el repositorio debería entender la propuesta del proyecto en menos de dos minutos.
+
+
+13. IDENTIDAD TÉCNICA DEL PROYECTO
+----------------------------------
+
+Amatista no debería presentarse simplemente como:
+
+"una plataforma de cursos".
+
+Una definición más clara sería:
+
+"Plataforma educativa offline-first para aprendizaje práctico de creación 3D orientada a WebXR, integrando Blender, modelos GLB, A-Frame y asistencia mediante IA local."
+
+Esta definición refleja mejor la diferenciación técnica del proyecto.
+
+
+14. RIESGOS PRINCIPALES
+-----------------------
+
+El principal riesgo no es la arquitectura.
+
+El principal riesgo es intentar desarrollar simultáneamente demasiadas tecnologías:
+
+- React.
+- PWA.
+- IndexedDB.
+- Service Worker.
+- A-Frame.
+- WebXR.
+- Python.
+- Oracle.
+- Cloudflare.
+- Ollama.
+- Túneles.
+- Sincronización.
+
+La solución es desarrollar verticalmente.
+
+En lugar de construir cada sistema completo por separado:
+
+Frontend completo
+Backend completo
+IA completa
+Base de datos completa
+
+es preferible construir una funcionalidad completa de principio a fin.
+
+Ejemplo:
+
+Lección
+  ↓
+descarga
+  ↓
+almacenamiento local
+  ↓
+visualización 3D
+  ↓
+actividad
+  ↓
+progreso
+  ↓
+sincronización
+
+Después se amplía el sistema.
+
+
+15. RECOMENDACIÓN FINAL
+-----------------------
+
+La arquitectura general de Amatista está bien planteada.
+
+La organización:
+
+frontend/
+backend/
+ai_tutor/
+docs/
+
+es adecuada y debería mantenerse.
+
+El proyecto debería avanzar bajo tres principios:
+
+1. OFFLINE-FIRST
+La funcionalidad educativa principal debe funcionar sin Internet.
+
+2. FRONTEND COMO NÚCLEO
+La experiencia del estudiante debe ser el centro de la arquitectura.
+
+3. SERVICIOS COMO CAPAS ADICIONALES
+Backend e IA deben mejorar la experiencia, pero no impedir que la plataforma funcione si no están disponibles.
+
+La siguiente etapa de Amatista no debería centrarse en reorganizar el repositorio.
+
+Debería centrarse en conseguir que un estudiante pueda:
+
+abrir Amatista
+→ descargar una lección
+→ quedarse sin conexión
+→ estudiar
+→ visualizar el contenido 3D
+→ completar una actividad
+→ guardar su progreso
+→ recuperar conexión
+→ sincronizar su progreso
+
+Cuando ese recorrido funcione correctamente, la arquitectura dejará de ser solamente una buena planificación y se convertirá en una base sólida para hacer crecer todo el proyecto.
+
+===========================================================
+FIN DEL DOCUMENTO
+===========================================================
