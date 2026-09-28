@@ -1,0 +1,73 @@
+=============================================================================
+DOCUMENTACIÓN DE INCIDENCIA Y RESOLUCIÓN: INSERCIÓN Y AUTOINCREMENTO EN ORACLE
+PROYECTO: AMATISTA PWA
+FECHA: SEPTIEMBRE 2026
+=============================================================================
+
+-----------------------------------------------------------------------------
+1. DESCRIPCIÓN DEL ERROR (ORA-01400 / ERROR 500)
+-----------------------------------------------------------------------------
+Al intentar registrar un nuevo usuario desde el Frontend, el servidor 
+FastAPI arrojó un Error 500 (Internal Server Error) causado por el siguiente 
+rechazo en la base de datos:
+
+    oracledb.exceptions.IntegrityError: ORA-01400: cannot insert NULL 
+    into ("ADMIN"."USUARIOS"."ID")
+
+* **Causa Raíz:** Oracle SQL es estrictamente tipado y requiere que las llaves 
+  primarias tengan un valor explícito o una regla de autoincremento. El modelo 
+  original de SQLAlchemy definía el `id` como llave primaria, pero no le 
+  indicaba a Oracle que debía generar el número automáticamente, lo que 
+  resultaba en un intento de inserción con valor nulo (NULL).
+
+-----------------------------------------------------------------------------
+2. DIAGNÓSTICO DE BLOQUEO DE MIGRACIÓN (FOREIGN KEYS)
+-----------------------------------------------------------------------------
+El primer intento de solución fue agregar la propiedad `Identity(start=1)` a 
+los modelos de SQLAlchemy y ejecutar `Base.metadata.drop_all()`. 
+Sin embargo, el error persistió.
+
+* **Causa del Bloqueo:** Oracle no permite eliminar (Drop) una tabla principal 
+  (como `usuarios`) si existen tablas secundarias (como `sesiones` o 
+  `progreso_lecciones`) conectadas a ella mediante llaves foráneas (Foreign Keys). 
+  SQLAlchemy falló silenciosamente al intentar borrar la tabla, manteniendo 
+  intacta la estructura defectuosa original.
+
+-----------------------------------------------------------------------------
+3. SOLUCIÓN IMPLEMENTADA (DEMOLICIÓN FORZADA)
+-----------------------------------------------------------------------------
+
+Paso A: Actualización de Modelos (SQLAlchemy)
+Se inyectó la directiva `Identity(start=1, always=True)` en las llaves 
+primarias numéricas de los modelos para obligar a Oracle a manejar el 
+autoincremento de forma nativa.
+
+Paso B: Script de Demolición con SQL Puro (`force_reset.py`)
+Para evadir la protección de llaves foráneas, se ejecutó un script en Python 
+que lanzó sentencias SQL puras usando `CASCADE CONSTRAINTS`. Esto destruyó 
+las dependencias y las tablas simultáneamente:
+    
+    DROP TABLE sesiones CASCADE CONSTRAINTS;
+    DROP TABLE progreso_lecciones CASCADE CONSTRAINTS;
+    DROP TABLE usuarios CASCADE CONSTRAINTS;
+
+Paso C: Reconstrucción y Despliegue
+Inmediatamente después de la demolición, se utilizó `Base.metadata.create_all()` 
+para construir el nuevo esquema con las reglas de autoincremento correctas, 
+seguido del reinicio limpio de Uvicorn.
+
+-----------------------------------------------------------------------------
+4. RESULTADO Y VERIFICACIÓN
+-----------------------------------------------------------------------------
+El endpoint `/api/iniciar-sesion` procesó exitosamente la petición. Oracle 
+generó automáticamente el ID numérico para el usuario y el UUID alfanumérico 
+para la sesión. 
+
+* Output verificado en Frontend:
+  - Mensaje: "Sesión creada en Oracle DB"
+  - Usuario ID: 1
+  - Sesión UUID: b7cb23f6-979d-4e4a-b464-992c8af...
+  
+El flujo de base de datos entre React, FastAPI y Oracle Autonomous 
+se declara estable y completamente funcional.
+=============================================================================
