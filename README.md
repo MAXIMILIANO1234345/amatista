@@ -1,8 +1,602 @@
 # Amatista PWA 💎
-Plataforma educativa offline enfocada en el flujo de diseño 3D desde Blender hacia A-Frame (WebXR).
 
-## Estructura del Monorepo
-* `/frontend`: Progressive Web App (Cloudflare Pages)
-* `/backend`: API y Base de Datos SQL (Oracle Free Tier)
-* `/ai_tutor`: Scripts locales para IA interactiva (Ollama)
-* `/docs`: Documentación técnica y reglas de contribución
+**Plataforma educativa offline-first para el aprendizaje práctico de creación 3D orientada a WebXR.**
+
+Amatista integra **Blender**, modelos **GLB**, **A-Frame**, **WebXR**, una **PWA**, persistencia local y asistencia mediante **IA** para construir una experiencia educativa que pueda seguir funcionando incluso cuando el estudiante pierde conexión a Internet.
+
+---
+
+## 📌 Descripción
+
+Amatista nace como una plataforma educativa enfocada en el flujo de trabajo:
+
+```text
+Blender
+   ↓
+Modelado y creación 3D
+   ↓
+Exportación GLB
+   ↓
+A-Frame / WebXR
+   ↓
+Experiencia educativa interactiva
+   ↓
+PWA Offline
+   ↓
+Sincronización de progreso
+   ↓
+Tutor IA
+```
+
+El objetivo del proyecto es permitir que los estudiantes aprendan conceptos relacionados con creación 3D y experiencias web inmersivas dentro de una plataforma accesible desde navegador y preparada para trabajar con conectividad limitada.
+
+---
+
+## 🎯 Objetivo
+
+Construir una plataforma educativa capaz de:
+
+- ofrecer rutas de aprendizaje;
+- presentar lecciones prácticas;
+- visualizar modelos y escenas 3D;
+- ejecutar experiencias con A-Frame y WebXR;
+- almacenar contenido y progreso localmente;
+- funcionar sin conexión mediante tecnologías PWA;
+- sincronizar el progreso cuando se recupera Internet;
+- ofrecer asistencia mediante un Tutor IA.
+
+---
+
+## 🧠 Filosofía del proyecto
+
+Amatista está diseñado bajo un principio principal:
+
+> **Local primero, servicios externos después.**
+
+La funcionalidad educativa principal debe poder seguir disponible aunque servicios externos no estén temporalmente accesibles.
+
+```text
+Usuario
+   ↓
+Amatista PWA
+   ↓
+IndexedDB
+   ↓
+Contenido + progreso local
+```
+
+Cuando existe conexión:
+
+```text
+PWA
+   ↓
+FastAPI
+   ↓
+Oracle Database
+```
+
+Cuando el Tutor IA está disponible:
+
+```text
+PWA
+   ↓
+FastAPI
+   ↓
+Ollama
+```
+
+El backend y la inteligencia artificial deben ampliar la experiencia, no convertirse en un requisito para acceder a contenido previamente descargado.
+
+---
+
+## 🏗️ Arquitectura general
+
+```text
+                         AMATISTA
+                            │
+                     ┌──────▼──────┐
+                     │     PWA     │
+                     │ React/Vite  │
+                     └──────┬──────┘
+                            │
+          ┌─────────────────┼─────────────────┐
+          │                 │                 │
+          ▼                 ▼                 ▼
+      Lecciones          WebXR             Offline
+                         A-Frame           IndexedDB
+          │                 │                 │
+          └─────────────────┴─────────────────┘
+                            │
+                      Sincronización
+                            │
+                     ┌──────▼──────┐
+                     │   FastAPI   │
+                     │   Python    │
+                     └────┬───┬────┘
+                          │   │
+                ┌─────────┘   └─────────┐
+                ▼                       ▼
+         Oracle Database              Ollama
+        usuarios/progreso            Tutor IA
+```
+
+---
+
+## 🗂️ Estructura del monorepo
+
+```text
+amatista/
+│
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   ├── package.json
+│   └── vite.config.js
+│
+├── backend/
+│   ├── api/
+│   ├── database/
+│   ├── main.py
+│   └── requirements.txt
+│
+├── ai_tutor/
+│   └── prompts/
+│
+├── docs/
+│   ├── arquitectura.txt
+│   ├── amatista_recomendaciones_arquitectura.txt
+│   ├── ARQUITECTURA DE BASE DE DATOS Y BACKEND.txt
+│   ├── convencion_commits.txt
+│   ├── mindmap.png
+│   └── mit.txt
+│
+├── .env.example
+├── .gitignore
+└── README.md
+```
+
+---
+
+## 🖥️ Frontend
+
+El frontend representa el núcleo de la experiencia del estudiante.
+
+### Tecnologías actuales
+
+- React
+- Vite
+- Tailwind CSS
+- A-Frame
+- WebXR
+- JavaScript
+
+### Responsabilidades previstas
+
+- Dashboard.
+- Ruta de aprendizaje.
+- Lecciones.
+- Visor 3D.
+- Experiencias WebXR.
+- Estado Online / Offline.
+- Descarga de contenido.
+- Gestión de progreso.
+- Comunicación con backend.
+- Comunicación con Tutor IA.
+
+Actualmente existe un **App Shell inicial** con React y una escena A-Frame integrada.
+
+---
+
+## 🌐 PWA y funcionamiento offline
+
+Uno de los objetivos principales de Amatista es que el estudiante pueda continuar trabajando aunque pierda conexión.
+
+La arquitectura offline contempla:
+
+- Service Worker;
+- caché del App Shell;
+- IndexedDB;
+- descarga de lecciones;
+- almacenamiento de progreso;
+- detección de conectividad;
+- sincronización posterior con el servidor.
+
+El flujo esperado es:
+
+```text
+Abrir Amatista
+   ↓
+Descargar una lección
+   ↓
+Guardar contenido localmente
+   ↓
+Perder conexión
+   ↓
+Continuar estudiando
+   ↓
+Guardar progreso en IndexedDB
+   ↓
+Recuperar conexión
+   ↓
+Sincronizar progreso
+```
+
+---
+
+## 🎮 WebXR y contenido 3D
+
+Amatista utiliza A-Frame como base para integrar contenido 3D directamente en navegador.
+
+El flujo de contenido planteado es:
+
+```text
+Blender
+   ↓
+Modelo 3D
+   ↓
+Exportación GLB
+   ↓
+A-Frame
+   ↓
+WebXR
+```
+
+Esto permitirá desarrollar actividades donde el estudiante pueda visualizar e interactuar con modelos directamente desde la plataforma.
+
+---
+
+## ⚙️ Backend
+
+La arquitectura de backend está planteada alrededor de:
+
+- Python;
+- FastAPI;
+- SQLAlchemy;
+- Oracle Database;
+- API REST;
+- sincronización de progreso.
+
+El backend tendrá responsabilidades como:
+
+- gestión de usuarios;
+- sesiones;
+- progreso de lecciones;
+- sincronización;
+- validación;
+- metadatos;
+- comunicación con servicios externos.
+
+El desarrollo del backend se encuentra actualmente **en proceso de integración al repositorio principal**.
+
+---
+
+## 🗄️ Base de datos
+
+El modelo inicial contempla tres entidades principales:
+
+```text
+usuarios
+sesiones
+progreso_lecciones
+```
+
+La intención es mantener inicialmente una estructura sencilla y expandirla únicamente cuando las funcionalidades del producto lo requieran.
+
+La información técnica sobre la conexión y arquitectura de Oracle se encuentra documentada dentro de:
+
+```text
+docs/ARQUITECTURA DE BASE DE DATOS Y BACKEND.txt
+```
+
+---
+
+## 🤖 Tutor IA
+
+Amatista contempla un Tutor IA basado en Ollama.
+
+Su función será asistir al estudiante dentro del contexto de las lecciones.
+
+Funciones previstas:
+
+- explicar conceptos;
+- resolver dudas;
+- ofrecer ayuda paso a paso;
+- orientar sobre Blender;
+- apoyar con A-Frame;
+- detectar errores comunes;
+- utilizar el contexto de la lección actual.
+
+El Tutor IA debe funcionar como una capa adicional.
+
+La plataforma educativa no debe depender de su disponibilidad.
+
+---
+
+## 🧰 Stack tecnológico
+
+| Área | Tecnología |
+|---|---|
+| Frontend | React |
+| Build Tool | Vite |
+| Estilos | Tailwind CSS |
+| 3D Web | A-Frame |
+| Experiencias inmersivas | WebXR |
+| PWA | Service Worker / Manifest |
+| Almacenamiento local | IndexedDB |
+| Backend | FastAPI |
+| Lenguaje backend | Python |
+| ORM | SQLAlchemy |
+| Base de datos | Oracle |
+| IA | Ollama |
+| Control de versiones | Git / GitHub |
+| Despliegue frontend | Cloudflare Pages |
+
+---
+
+## 🚧 Estado actual
+
+Amatista se encuentra actualmente en una etapa temprana de desarrollo.
+
+### Implementado
+
+- [x] Estructura base del monorepo.
+- [x] Frontend con React y Vite.
+- [x] Configuración inicial de Tailwind CSS.
+- [x] App Shell inicial.
+- [x] Integración básica de A-Frame.
+- [x] Visor 3D inicial.
+- [x] Identidad visual base.
+- [x] Arquitectura general documentada.
+- [x] Convención de commits.
+- [x] Arquitectura de backend y base de datos documentada.
+- [x] Plantilla de variables de entorno.
+
+### En desarrollo
+
+- [ ] Manifest PWA funcional.
+- [ ] Service Worker.
+- [ ] IndexedDB.
+- [ ] Gestión de contenido offline.
+- [ ] Sistema de lecciones.
+- [ ] Ruta de aprendizaje.
+- [ ] Progreso local.
+- [ ] API FastAPI.
+- [ ] Integración de Oracle.
+- [ ] Sincronización frontend/backend.
+- [ ] Integración del Tutor IA.
+- [ ] Carga dinámica de modelos GLB.
+- [ ] Experiencias WebXR completas.
+
+---
+
+## 🗺️ Roadmap inicial
+
+### Fase 1 — PWA Offline
+
+- Manifest.
+- Service Worker.
+- IndexedDB.
+- detección de conectividad;
+- almacenamiento local;
+- descarga de contenido.
+
+### Fase 2 — Plataforma educativa
+
+- Dashboard.
+- Rutas de aprendizaje.
+- Lecciones.
+- Actividades.
+- Progreso.
+
+### Fase 3 — 3D y WebXR
+
+- Carga de modelos GLB.
+- Escenas reutilizables.
+- Interacción con modelos.
+- Actividades inmersivas.
+
+### Fase 4 — Backend
+
+- FastAPI.
+- Usuarios.
+- Sesiones.
+- Progreso.
+- Oracle.
+- Sincronización.
+
+### Fase 5 — Tutor IA
+
+- Integración con Ollama.
+- Prompts especializados.
+- Contexto de lecciones.
+- Historial.
+- Manejo de disponibilidad.
+
+---
+
+## 🚀 Ejecución del frontend
+
+### Requisitos
+
+- Node.js
+- npm
+- Git
+
+Clonar el repositorio:
+
+```bash
+git clone https://github.com/MAXIMILIANO1234345/amatista.git
+```
+
+Entrar al frontend:
+
+```bash
+cd amatista/frontend
+```
+
+Instalar dependencias:
+
+```bash
+npm install
+```
+
+Ejecutar el entorno de desarrollo:
+
+```bash
+npm run dev
+```
+
+Generar build de producción:
+
+```bash
+npm run build
+```
+
+---
+
+## 🔐 Variables de entorno
+
+El repositorio incluye:
+
+```text
+.env.example
+```
+
+Este archivo sirve como referencia para configurar los servicios externos.
+
+Ejemplo:
+
+```env
+DB_USER=
+DB_PASSWORD=
+DB_HOST=
+
+OLLAMA_URL=http://localhost:11434
+```
+
+> Nunca deben publicarse contraseñas, tokens, wallets, claves privadas o credenciales reales dentro del repositorio.
+
+---
+
+## 📝 Convención de commits
+
+Amatista utiliza la estructura:
+
+```text
+type(scope): descripción
+```
+
+Ejemplos:
+
+```text
+feat(pwa): implementar almacenamiento de lecciones con indexeddb
+fix(pwa): corregir detección del estado offline
+feat(api): agregar endpoint de progreso
+feat(db): crear modelo de progreso de lecciones
+feat(ia): integrar cliente de ollama
+docs(repo): actualizar arquitectura del proyecto
+chore(repo): actualizar dependencias
+```
+
+La documentación completa se encuentra en:
+
+```text
+docs/convencion_commits.txt
+```
+
+---
+
+## 📚 Documentación
+
+La documentación técnica del proyecto se encuentra en:
+
+```text
+/docs
+```
+
+Incluye:
+
+- arquitectura general;
+- recomendaciones de organización;
+- arquitectura de backend;
+- arquitectura de base de datos;
+- convención de commits;
+- mapa conceptual;
+- licencia.
+
+---
+
+## 🔒 Seguridad
+
+El proyecto sigue como principio evitar la publicación de:
+
+- contraseñas;
+- tokens;
+- IPs sensibles;
+- credenciales de infraestructura;
+- secretos de Oracle;
+- wallets;
+- claves SSH;
+- archivos `.env` reales.
+
+Toda configuración sensible debe realizarse mediante variables de entorno.
+
+---
+
+## 🤝 Contribución
+
+Amatista se encuentra actualmente en desarrollo.
+
+Antes de contribuir se recomienda consultar:
+
+```text
+docs/convencion_commits.txt
+```
+
+Las contribuciones deben mantener la separación de responsabilidades del monorepo y evitar introducir dependencias innecesarias entre frontend, backend e IA.
+
+---
+
+## 📄 Licencia
+
+La información actual de licencia se encuentra en:
+
+```text
+docs/mit.txt
+```
+
+Se recomienda posteriormente moverla a un archivo estándar:
+
+```text
+LICENSE
+```
+
+en la raíz del repositorio.
+
+---
+
+## 💎 Visión
+
+Amatista busca evolucionar hacia un entorno de aprendizaje práctico donde un estudiante pueda:
+
+```text
+aprender
+   ↓
+crear en Blender
+   ↓
+exportar contenido
+   ↓
+visualizarlo en WebXR
+   ↓
+trabajar offline
+   ↓
+guardar su progreso
+   ↓
+sincronizarlo
+   ↓
+recibir apoyo de un Tutor IA
+```
+
+El objetivo no es únicamente construir una plataforma de cursos.
+
+El objetivo es construir un **entorno educativo práctico para creación 3D orientada a WebXR**.
