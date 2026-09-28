@@ -1,0 +1,77 @@
+=============================================================================
+DOCUMENTACIÓN DE INCIDENCIA Y RESOLUCIÓN: PUERTO OCUPADO Y CORS (ERRNO 98)
+PROYECTO: AMATISTA PWA
+FECHA: SEPTIEMBRE 2026
+=============================================================================
+
+-----------------------------------------------------------------------------
+1. DESCRIPCIÓN DEL ERROR (ERRNO 98)
+-----------------------------------------------------------------------------
+Durante el despliegue y reinicio del backend en el servidor Oracle Cloud ARM, 
+el servicio FastAPI (Uvicorn) falló al intentar iniciar en el puerto 8000, 
+arrojando el siguiente error en la terminal:
+
+    ERROR:    [Errno 98] error while attempting to bind on address ('0.0.0.0', 8000): address already in use
+
+* **Causa Raíz:** Ya existía una instancia previa de Uvicorn o un proceso 
+  huérfano ejecutándose en segundo plano en el servidor, el cual mantenía 
+  capturado y bloqueado el puerto 8000. Como resultado, las peticiones del 
+  frontend local (React) seguían siendo atendidas por el código viejo o 
+  simplemente rechazadas, derivando en un fallo de CORS y "Failed to fetch".
+
+-----------------------------------------------------------------------------
+2. DIAGNÓSTICO DE CORS EN EL FRONTEND
+-----------------------------------------------------------------------------
+Simultáneamente, el navegador web bloqueaba las peticiones provenientes del 
+entorno de desarrollo local (ej. `http://localhost:5176`):
+
+    Access to fetch at 'http://158.101.118.222:8000/' from origin 
+    'http://localhost:5176' has been blocked by CORS policy: No 
+    'Access-Control-Allow-Origin' header is present on the requested resource.
+
+* **Causa:** El servidor no estaba aplicando las cabeceras de control de 
+  orígenes cruzados porque el proceso activo en el puerto 8000 correspondía 
+  a una versión desactualizada de `main.py` que carecía de `CORSMiddleware`.
+
+-----------------------------------------------------------------------------
+3. PASOS DE CORRECCIÓN APLICADOS
+-----------------------------------------------------------------------------
+
+Paso A: Matar el proceso fantasma en el puerto 8000
+Se ejecutó un comando de control de procesos en Linux para liberar el puerto 
+por la fuerza:
+    sudo fuser -k 8000/tcp
+
+Paso B: Verificación y aplicación del código actualizado (`main.py`)
+Se aseguró que el archivo `main.py` contuviera la configuración explícita de 
+CORS para aceptar conexiones de cualquier origen durante la fase de desarrollo:
+
+    from fastapi import FastAPI
+    from fastapi.middleware.cors import CORSMiddleware
+    from database.connection import engine
+    from database import models
+
+    models.Base.metadata.create_all(bind=engine)
+
+    app = FastAPI(title="Amatista API")
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    @app.get("/")
+    def read_root():
+        return {"estado": "Backend activo y conectado a Oracle SQL"}
+
+Paso C: Reinicio limpio del servidor FastAPI
+Con el entorno virtual activado, se relanzó Uvicorn sin conflictos de puerto:
+    uvicorn main:app --host 0.0.0.0 --port 8000
+
+* **Resultado:** El servidor inició correctamente ("Application startup complete"), 
+  eliminó el error [Errno 98], disolvió el bloqueo de CORS y permitió que la PWA 
+  en React reflejara con éxito el estado **"Oracle: Conectado"**.
+=============================================================================
