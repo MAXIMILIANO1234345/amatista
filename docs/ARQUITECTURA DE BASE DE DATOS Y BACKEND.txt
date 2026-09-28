@@ -1,0 +1,148 @@
+=============================================================================
+DOCUMENTACIÓN TÉCNICA: ARQUITECTURA DE BASE DE DATOS Y BACKEND
+PROYECTO: AMATISTA PWA
+FECHA: SEPTIEMBRE 2026
+=============================================================================
+
+-----------------------------------------------------------------------------
+1. DIAGRAMA DE ARQUITECTURA DESACOPLADA
+-----------------------------------------------------------------------------
+El sistema Amatista opera bajo un modelo de recursos distribuidos, separando
+el poder de cómputo (IA y Backend) del almacenamiento de metadatos (SQL).
+
+      [ CLIENTE ]
+           │
+           │ (HTTP a través del puerto 8000 con CORS)
+           ▼
+  ┌─────────────────────────────────────────────────────────┐
+  │ SERVIDOR ORACLE ARM (Instancia de Cómputo - 50 GB)      │
+  │ IP: 158.101.118.222                                     │
+  │                                                         │
+  │  [ FastAPI (Python) ] ◄─────► [ Ollama (Puerto 11434) ] │
+  │    Gestión de rutas             Modelo Phi-3 (Tutor)    │
+  └────────┬────────────────────────────────────────────────┘
+           │
+           │ (Red Segura: Protocolo TCPS - Puerto 1522)
+           │ (Bloqueado por ACL: Solo acepta IP 158.101.118.222)
+           ▼
+  ┌─────────────────────────────────────────────────────────┐
+  │ ORACLE AUTONOMOUS DATABASE (ATP 26ai - 20 GB)           │
+  │ Host: adb.us-ashburn-1.oraclecloud.com                  │
+  │                                                         │
+  │  [ Tablas: usuarios, sesiones, progreso_lecciones ]     │
+  └─────────────────────────────────────────────────────────┘
+
+-----------------------------------------------------------------------------
+2. HISTORIAL DE DESARROLLO Y RESOLUCIÓN DE PROBLEMAS
+-----------------------------------------------------------------------------
+
+FASE 1: Configuración de Seguridad en Oracle Cloud (El Búnker)
+Objetivo: Conectar la base de datos sin requerir pesados archivos Wallet.
+- Problema: Oracle exige Mutual TLS (mTLS) por defecto.
+- Solución: Se activó una Access Control List (ACL) permitiendo únicamente 
+  la IP del servidor ARM (158.101.118.222). Esto permitió degradar el 
+  requisito de mTLS a TLS estándar (Allow secure access from everywhere 
+  -> Disabled).
+
+FASE 2: Enrutamiento en el Servidor Linux (.env)
+Objetivo: Dotar a Python de las coordenadas exactas de la base de datos.
+- Archivo configurado: `amatista/backend/.env`
+- Código:
+    DB_USER=admin
+    DB_PASSWORD=[CENSURADO]
+    DB_HOST=adb.us-ashburn-1.oraclecloud.com
+    DB_PORT=1522
+    DB_SERVICE=g0dfb7bc6d42c6f_amatistadb_high.adb.oraclecloud.com
+
+FASE 3: El Handshake de Seguridad (El Puente de Python)
+Objetivo: Conectar SQLAlchemy a Oracle.
+- Problema (Errno 104 Connection reset by peer): El motor oracledb intentaba
+  comunicarse en texto plano (TCP) hacia el puerto 1522 (Cifrado), causando 
+  que el firewall de Oracle cerrara la conexión por protocolo inválido.
+- Solución: Se inyectó el parámetro `protocol="tcps"` directamente en el 
+  creador de la conexión de SQLAlchemy.
+- Código (database/connection.py):
+    import os
+    import oracledb
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+    from dotenv import load_dotenv
+
+    load_dotenv()
+    
+    def get_connection():
+        return oracledb.connect(
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASSWORD"),
+            host=os.getenv("DB_HOST"),
+            port=os.getenv("DB_PORT", "1522"),
+            service_name=os.getenv("DB_SERVICE"),
+            protocol="tcps" # PARÁMETRO CRÍTICO QUE RESUELVE EL ERRNO 104
+        )
+
+    engine = create_engine("oracle+oracledb://", creator=get_connection)
+    SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+FASE 4: Modelado de Datos (Construcción de Tablas)
+Objetivo: Definir la estructura relacional con SQLAlchemy.
+- Problema (ORA-01408: such column list already indexed): Durante la 
+  migración, SQLAlchemy intentó crear índices en columnas que Oracle 
+  ya había indexado automáticamente por ser Primary Keys o Uniques.
+- Solución: Se eliminaron los parámetros `index=True` redundantes.
+- Código (database/models.py):
+    from sqlalchemy import Column, Integer, String, DateTime, ForeignKey, Boolean
+    from sqlalchemy.ext.declarative import declarative_base
+    from datetime import datetime
+
+    Base = declarative_base()
+
+    class Usuario(Base):
+        __tablename__ = 'usuarios'
+        id = Column(Integer, primary_key=True)
+        email = Column(String(100), unique=True, nullable=False)
+        creado_en = Column(DateTime, default=datetime.utcnow)
+
+    class Sesion(Base):
+        __tablename__ = 'sesiones'
+        id = Column(String(50), primary_key=True)
+        usuario_id = Column(Integer, ForeignKey('usuarios.id'), nullable=False)
+        dispositivo = Column(String(50))
+        activa = Column(Boolean, default=True)
+        ultimo_acceso = Column(DateTime, default=datetime.utcnow)
+
+    class Progreso(Base):
+        __tablename__ = 'progreso_lecciones'
+        id = Column(Integer, primary_key=True)
+        usuario_id = Column(Integer, ForeignKey('usuarios.id'), nullable=False)
+        leccion_id = Column(String(50), index=True, nullable=False) # Único índice manual
+        completada = Column(Boolean, default=False)
+        datos_ligeros = Column(String(250))
+        actualizado_en = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+FASE 5: Exposición de la API y Comunicación Frontend (CORS)
+Objetivo: Permitir que la PWA React local interactúe con el servidor Oracle.
+- Problema: Los navegadores bloquean por defecto las peticiones entre 
+  diferentes dominios/IPs.
+- Solución: Implementación de CORSMiddleware en FastAPI.
+- Código (main.py):
+    from fastapi import FastAPI
+    from fastapi.middleware.cors import CORSMiddleware
+    from database.connection import engine
+    from database import models
+
+    # Migración de tablas
+    models.Base.metadata.create_all(bind=engine)
+
+    app = FastAPI(title="Amatista API")
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"], # Permitir peticiones externas
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    @app.get("/")
+    def read_root():
+        return {"estado": "Backend activo y conectado a Oracle SQL, con CORS habilitado"}
