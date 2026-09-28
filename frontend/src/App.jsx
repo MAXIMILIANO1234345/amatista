@@ -1,6 +1,23 @@
-import './index.css'
+import './index.css';
+import { useEffect, useState } from 'react';
+import { checkBackendStatus } from './services/api';
 
 function App() {
+  const [status, setStatus] = useState("Conectando...");
+
+  useEffect(() => {
+    const fetchStatus = async () => {
+      const data = await checkBackendStatus();
+      if (data && data.estado) {
+        setStatus("Oracle: Conectado");
+        console.log("Mensaje del servidor:", data.estado);
+      } else {
+        setStatus("Oracle: Desconectado");
+      }
+    };
+    fetchStatus();
+  }, []);
+
   return (
     <div className="min-h-screen bg-base text-white flex flex-col font-sans">
       {/* Barra de Navegación */}
@@ -8,8 +25,12 @@ function App() {
         <h1 className="text-2xl font-bold tracking-widest text-amatista">
           AMATISTA<span className="text-neon">.PWA</span>
         </h1>
-        <span className="px-3 py-1 bg-amatista/20 text-amatista rounded-full text-sm border border-amatista/50 font-medium">
-          Estado: Online
+        <span className={`px-3 py-1 rounded-full text-sm border font-medium ${
+          status.includes("Conectado") 
+            ? "bg-amatista/20 text-amatista border-amatista/50" 
+            : "bg-red-500/20 text-red-400 border-red-500/50"
+        }`}>
+          Estado: {status}
         </span>
       </header>
 
@@ -45,7 +66,7 @@ function App() {
         </section>
       </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
