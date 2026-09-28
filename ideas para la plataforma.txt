@@ -1,0 +1,28 @@
+=============================================================================
+VISIÓN DE PRODUCTO Y ARQUITECTURA: AMATISTA 3D LAB
+FECHA: SEPTIEMBRE 2026
+=============================================================================
+
+1. CONCEPTO CENTRAL
+Amatista evoluciona de una plataforma educativa tradicional a un Laboratorio 
+WebXR y de Generación 3D impulsado por Inteligencia Artificial. El núcleo es 
+la práctica, la visualización espacial y la automatización 3D.
+
+2. LOS TRES PILARES DE LA PLATAFORMA
+A) El Laboratorio Web (Frontend PWA + A-Frame)
+   - Espacio de trabajo inmersivo en el navegador.
+   - Renderizado en tiempo real de modelos, iluminación y físicas.
+   - Capacidad WebXR nativa para visualización en dispositivos móviles (AR/VR).
+
+B) El Ecosistema Nativo (Add-on de Blender + FastAPI + Oracle)
+   - Puente bidireccional entre la PWA y el software de escritorio.
+   - Sincronización de cuentas y sesiones vía Oracle SQL.
+   - Capacidad para enviar/recibir scripts de Python y modelos 3D directamente 
+     al entorno de Blender desde la nube.
+
+C) Tutor IA Especializado (Ollama + LLaMA/Phi3)
+   - Asistente contextual enfocado estrictamente en el entorno 3D.
+   - Generador y depurador de scripts para la API de Blender (import bpy).
+   - Corrector de sintaxis HTML/JS para entidades de A-Frame.
+   - Guía en técnicas de prompt engineering para IA generativa aplicada a 3D.
+=============================================================================
