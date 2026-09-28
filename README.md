@@ -143,13 +143,11 @@ amatista/
 │   └── prompts/
 │
 ├── docs/
-│   ├── arquitectura.txt
-│   ├── amatista_recomendaciones_arquitectura.txt
-│   ├── ARQUITECTURA DE BASE DE DATOS Y BACKEND.txt
-│   ├── convencion_commits.txt
-│   ├── mindmap.png
-│   ├── motor_generativo_3d.txt
-│   └── mit.txt
+│   ├── arquitectura/      # arquitectura general, backend/BD, recomendaciones, mindmap
+│   ├── bitacora/          # resúmenes y reportes de avance por fecha
+│   ├── incidencias/       # errores resueltos (AAAA-MM-DD_tema.txt)
+│   ├── propuestas/        # ideas y ramas futuras (3D Lab, motor generativo)
+│   └── convencion_commits.txt
 │
 ├── .env.example
 ├── .gitignore
@@ -286,7 +284,7 @@ La intención es mantener inicialmente una estructura sencilla y expandirla úni
 La información técnica sobre la conexión y arquitectura de Oracle se encuentra documentada dentro de:
 
 ```text
-docs/ARQUITECTURA DE BASE DE DATOS Y BACKEND.txt
+docs/arquitectura/backend_y_base_de_datos.txt
 ```
 
 ---
@@ -332,7 +330,7 @@ Visor A-Frame / WebXR
 Este módulo se desarrollará en una **rama independiente** y no cambia el roadmap principal. Detalles en:
 
 ```text
-docs/motor_generativo_3d.txt
+docs/propuestas/motor_generativo_3d.txt
 ```
 
 ---
@@ -546,8 +544,10 @@ Incluye:
 - arquitectura de backend;
 - arquitectura de base de datos;
 - convención de commits;
-- mapa conceptual;
-- licencia.
+- mapa conceptual (`docs/arquitectura/mindmap.png`);
+- incidencias resueltas (`docs/incidencias/`);
+- bitácora de avances (`docs/bitacora/`);
+- propuestas de producto: Amatista 3D Lab y motor generativo 3D (`docs/propuestas/`).
 
 ---
 
@@ -584,19 +584,7 @@ Las contribuciones deben mantener la separación de responsabilidades del monore
 
 ## 📄 Licencia
 
-La información actual de licencia se encuentra en:
-
-```text
-docs/mit.txt
-```
-
-Se recomienda posteriormente moverla a un archivo estándar:
-
-```text
-LICENSE
-```
-
-en la raíz del repositorio.
+El proyecto todavía no define una licencia. Cuando se elija una (por ejemplo MIT), debe agregarse como archivo `LICENSE` en la raíz del repositorio.
 
 ---
 

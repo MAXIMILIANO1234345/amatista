@@ -1,0 +1,143 @@
+=============================================================================
+BITÁCORA: RESUMEN DE AVANCE, REVISIÓN DE CÓDIGO Y REVISIÓN DE PROPUESTA
+PROYECTO: AMATISTA PWA
+FECHA: 28 DE SEPTIEMBRE DE 2026
+PERIODO CUBIERTO: 27 Y 28 DE SEPTIEMBRE DE 2026
+=============================================================================
+
+-----------------------------------------------------------------------------
+1. LO QUE SE HIZO CON ÉXITO
+-----------------------------------------------------------------------------
+[OK] Conexión completa React -> FastAPI -> Oracle Autonomous DB.
+     El frontend muestra "Oracle: Conectado" con el backend real.
+     (Ver incidencias/2026-09-27_puerto-ocupado-y-cors.txt)
+
+[OK] Flujo de sesiones funcionando (commit 87f6729, Kaneda343).
+     El endpoint /api/iniciar-sesion crea el usuario y la sesión en Oracle
+     y el frontend muestra el Usuario ID y el UUID de la sesión.
+
+[OK] Autoincremento de llaves primarias en Oracle con Identity().
+     (Ver incidencias/2026-09-27_ora-01400-autoincremento.txt)
+
+[OK] Frontend migrado correctamente a Tailwind v4 (PR #6).
+     La paleta de colores (amatista, neon, base, superficie) ya se aplica.
+
+[OK] Limpieza del frontend: se eliminaron los api.js duplicados y los
+     restos de la plantilla de Vite (PR #6).
+
+[OK] Documentado el motor generativo 3D como rama aparte
+     (propuestas/motor_generativo_3d.txt).
+
+[OK] Nueva visión de producto "Amatista 3D Lab"
+     (propuestas/amatista_3d_lab.txt).
+
+[OK] Repositorio reorganizado (28/09). Los archivos que estaban sueltos en
+     la raíz se movieron a docs/, que ahora está dividido en:
+       docs/arquitectura/   arquitectura general, backend/BD, recomendaciones
+       docs/bitacora/       resúmenes y reportes por fecha
+       docs/incidencias/    errores resueltos (AAAA-MM-DD_tema.txt)
+       docs/propuestas/     ideas y ramas futuras
+     "docs/mit.txt" no era una licencia sino el reporte del App Shell; se
+     movió a bitacora/2026-09-27_reporte_app_shell.txt.
+
+-----------------------------------------------------------------------------
+2. FALLOS E INCIDENCIAS
+-----------------------------------------------------------------------------
+[RESUELTO] Errno 98: puerto 8000 ocupado por un Uvicorn huérfano.
+     Recomendación: ejecutar el backend como servicio de systemd para que
+     no queden procesos fantasma al reiniciar.
+
+[RESUELTO] Bloqueo de CORS: el proceso activo era una versión vieja de
+     main.py sin CORSMiddleware.
+
+[RESUELTO] ORA-01400: el id de usuarios se insertaba como NULL.
+     Costo: se borraron las tablas con DROP ... CASCADE CONSTRAINTS y se
+     perdieron los datos. Aceptable en desarrollo, NO en producción.
+
+[RESUELTO HOY] Regresión del indicador de estado.
+     El commit 87f6729 se hizo sobre una versión anterior de App.jsx y
+     deshizo el arreglo del PR #6: el badge volvía a decir "Conectado"
+     aunque el backend fallara. Se volvió a corregir. También se agregó un
+     mensaje visible cuando falla "Crear Nueva Sesión".
+     Prevención: hacer "git pull origin main" antes de empezar a trabajar.
+
+[PENDIENTE] El código del backend NO está en el repositorio.
+     backend/main.py y backend/requirements.txt siguen vacíos. main.py,
+     database/connection.py, database/models.py y force_reset.py solo
+     existen en el servidor ARM. Si el servidor se pierde, se pierde el
+     backend. ES LA PRIORIDAD NÚMERO 1.
+
+[PENDIENTE] La PWA todavía no funciona sin conexión.
+     manifest.json y sw.js están vacíos, y A-Frame se carga desde un CDN.
+
+-----------------------------------------------------------------------------
+3. REVISIÓN DE CÓDIGO
+-----------------------------------------------------------------------------
+Frontend (compila y pasa ESLint después de los cambios de hoy):
+  - App.jsx: corregida la lógica del estado de conexión (ver sección 2).
+  - services/api.js: la IP del servidor está fija y usa http://. Si el
+    frontend se publica en Cloudflare Pages (https), el navegador bloqueará
+    las peticiones ("mixed content"). El backend necesita HTTPS, por
+    ejemplo con Caddy, Nginx o un Cloudflare Tunnel.
+  - index.html: registra un service worker vacío y un manifest vacío.
+
+Backend (revisado a partir de lo que describen las incidencias):
+  - CORS con allow_origins=["*"] y allow_credentials=True: sirve para
+    desarrollo, pero permite que cualquier sitio llame a la API. En
+    producción, limitarlo a localhost y al dominio de Cloudflare Pages.
+  - /api/iniciar-sesion solo pide un email, sin contraseña ni token.
+    Cualquiera puede crear sesiones a nombre de cualquier correo. Antes de
+    sincronizar progreso o conectar el add-on de Blender se necesita
+    autenticación real.
+  - La aplicación usa el usuario ADMIN de Oracle. Conviene crear un
+    usuario de la aplicación con permisos mínimos.
+  - Los cambios de esquema se hacen borrando tablas. Se recomienda usar
+    Alembic (migraciones) antes de tener datos reales.
+
+Proceso:
+  - Varios archivos se subieron con "Add files via upload" directo a
+    main y a la raíz. Usar las carpetas de docs/ y la convención
+    type(scope): descripción (ver convencion_commits.txt).
+  - No hay pruebas ni CI. Un workflow mínimo (lint + build del frontend)
+    habría detectado la regresión.
+
+-----------------------------------------------------------------------------
+4. REVISIÓN DE LA PROPUESTA "AMATISTA 3D LAB"
+-----------------------------------------------------------------------------
+Lo que funciona bien:
+  - Es más diferenciadora que una plataforma de cursos: un laboratorio
+    práctico que conecta el navegador con Blender.
+  - El pilar C (tutor que genera y depura scripts bpy) y el motor
+    generativo 3D son casi la misma tecnología. Conviene unirlos: el
+    tutor escribe el script, Blender lo ejecuta y A-Frame muestra el
+    resultado.
+  - El add-on de Blender (pilar B) es la idea más valiosa: nadie más
+    une Blender de escritorio con WebXR de esta forma.
+
+Riesgos y puntos por definir:
+  1. Choca con "local primero". La IA, el add-on y el motor generativo
+     necesitan conexión. Hay que definir qué funciona sin Internet
+     (visor, lecciones y modelos descargados) y qué no.
+  2. Seguridad del add-on. Enviar scripts de Python desde la nube a
+     Blender significa ejecutar código en la computadora del estudiante.
+     El add-on NUNCA debe ejecutarlos automáticamente: debe mostrar el
+     script y pedir confirmación, y conectarse solo con un token de la
+     sesión.
+  3. Autenticación. El pilar B depende de "sincronización de cuentas",
+     pero hoy no hay contraseña ni token (ver sección 3).
+  4. Modelo de IA. Phi-3 en un CPU ARM es lento y escribe código bpy de
+     calidad limitada. Probar modelos especializados en código y medir
+     tiempos antes de comprometerse.
+  5. Físicas en A-Frame no vienen incluidas; requieren un componente
+     adicional de físicas.
+  6. Alcance. Tres pilares más el motor generativo es mucho para un equipo
+     pequeño. Si la plataforma deja de ser "educativa tradicional",
+     actualizar el README para que todo el equipo tenga la misma visión.
+
+Orden sugerido:
+  1. Subir el backend al repo y agregar autenticación básica.
+  2. Terminar la PWA offline y cargar modelos GLB en el visor.
+  3. Tutor IA generador de scripts bpy (vista previa en A-Frame).
+  4. Add-on de Blender (con confirmación antes de ejecutar).
+  5. Motor generativo 3D en su propia rama.
+=============================================================================

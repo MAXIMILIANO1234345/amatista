@@ -4,12 +4,15 @@ import { checkBackendStatus, iniciarSesionBD } from './services/api';
 
 function App() {
   const [status, setStatus] = useState("Conectando...");
+  const [online, setOnline] = useState(false);
   const [sesionActiva, setSesionActiva] = useState(null);
+  const [errorSesion, setErrorSesion] = useState(false);
 
   useEffect(() => {
     const fetchStatus = async () => {
       const data = await checkBackendStatus();
-      if (data && data.estado) {
+      if (data && data.estado && data.estado !== "Desconectado") {
+        setOnline(true);
         setStatus("Oracle: Conectado");
       } else {
         setStatus("Oracle: Desconectado");
@@ -24,6 +27,9 @@ function App() {
     const datosDB = await iniciarSesionBD("alumno_prueba@amatista.local");
     if (datosDB) {
       setSesionActiva(datosDB);
+      setErrorSesion(false);
+    } else {
+      setErrorSesion(true);
     }
   };
 
@@ -35,7 +41,7 @@ function App() {
           AMATISTA<span className="text-neon">.PWA</span>
         </h1>
         <span className={`px-3 py-1 rounded-full text-sm border font-medium ${
-          status.includes("Conectado") 
+          online 
             ? "bg-amatista/20 text-amatista border-amatista/50" 
             : "bg-red-500/20 text-red-400 border-red-500/50"
         }`}>
@@ -50,12 +56,17 @@ function App() {
           <div className="border-b border-white/10 pb-4">
             <h2 className="text-amatista font-semibold mb-2">Gestor de Base de Datos</h2>
             {!sesionActiva ? (
+              <>
               <button 
                 onClick={handleCrearSesion}
                 className="w-full bg-amatista hover:bg-amatista/80 text-white py-2 rounded transition-colors text-sm font-bold"
               >
                 Crear Nueva Sesión (Prueba)
               </button>
+              {errorSesion && (
+                <p className="text-red-400 text-xs mt-2">No se pudo crear la sesión. Revisa la conexión con el backend.</p>
+              )}
+              </>
             ) : (
               <div className="bg-black/50 p-3 rounded border border-amatista/30 text-xs">
                 <p className="text-emerald-400 mb-1">✔ {sesionActiva.mensaje}</p>
