@@ -4,11 +4,13 @@ import { checkBackendStatus } from './services/api';
 
 function App() {
   const [status, setStatus] = useState("Conectando...");
+  const [online, setOnline] = useState(false);
 
   useEffect(() => {
     const fetchStatus = async () => {
       const data = await checkBackendStatus();
-      if (data && data.estado) {
+      if (data && data.estado && data.estado !== "Desconectado") {
+        setOnline(true);
         setStatus("Oracle: Conectado");
         console.log("Mensaje del servidor:", data.estado);
       } else {
@@ -26,7 +28,7 @@ function App() {
           AMATISTA<span className="text-neon">.PWA</span>
         </h1>
         <span className={`px-3 py-1 rounded-full text-sm border font-medium ${
-          status.includes("Conectado") 
+          online 
             ? "bg-amatista/20 text-amatista border-amatista/50" 
             : "bg-red-500/20 text-red-400 border-red-500/50"
         }`}>
