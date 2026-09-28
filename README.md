@@ -148,6 +148,7 @@ amatista/
 │   ├── ARQUITECTURA DE BASE DE DATOS Y BACKEND.txt
 │   ├── convencion_commits.txt
 │   ├── mindmap.png
+│   ├── motor_generativo_3d.txt
 │   └── mit.txt
 │
 ├── .env.example
@@ -309,6 +310,30 @@ Funciones previstas:
 El Tutor IA debe funcionar como una capa adicional.
 
 La plataforma educativa no debe depender de su disponibilidad.
+
+---
+
+## 🧪 Motor generativo 3D (rama aparte)
+
+Amatista también podrá funcionar como un **motor gratuito de generación de modelos 3D con IA**, de forma parecida a como herramientas como Nano Banana o GPT generan imágenes, pero usando **Blender** como motor gráfico:
+
+```text
+Prompt en lenguaje natural
+   ↓
+IA local (Ollama) genera un script bpy
+   ↓
+Blender headless construye y renderiza
+   ↓
+Exportación GLB
+   ↓
+Visor A-Frame / WebXR
+```
+
+Este módulo se desarrollará en una **rama independiente** y no cambia el roadmap principal. Detalles en:
+
+```text
+docs/motor_generativo_3d.txt
+```
 
 ---
 

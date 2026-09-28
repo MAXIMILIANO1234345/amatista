@@ -1,0 +1,74 @@
+=============================================================================
+AMATISTA - MOTOR GENERATIVO 3D (RAMA DE DESARROLLO APARTE)
+ESTADO: PROPUESTA / SOLO DOCUMENTACIÓN
+FECHA: SEPTIEMBRE 2026
+=============================================================================
+
+1. IDEA
+-----------------------------------------------------------------------------
+Además de enseñar el flujo Blender -> GLB -> A-Frame, Amatista podrá ofrecer
+un motor gratuito de generación de modelos 3D asistido por IA.
+
+Del mismo modo que herramientas como Nano Banana (Gemini) o la generación de
+imágenes de GPT crean imágenes a partir de texto, Amatista busca generar
+modelos 3D a partir de una instrucción en lenguaje natural, usando Blender
+como motor gráfico para construir, renderizar y exportar el resultado.
+
+   "Crea una silla low poly de madera"
+            │
+            ▼
+   IA (LLM local vía Ollama)
+            │  genera un script de Blender (Python / bpy)
+            ▼
+   Blender en modo headless (blender --background --python)
+            │  construye la escena, aplica materiales y renderiza
+            ▼
+   Exportación .glb + imagen de vista previa
+            │
+            ▼
+   Visor A-Frame / WebXR dentro de Amatista
+
+2. PRINCIPIOS
+-----------------------------------------------------------------------------
+- Gratuito y con herramientas abiertas: Blender (GPL) + modelos locales en
+  Ollama. Sin depender de APIs de pago.
+- Separado de la plataforma educativa: el motor es un servicio opcional.
+  Si no está disponible, Amatista sigue funcionando (local primero).
+- Educativo: el script bpy generado se muestra al estudiante para que
+  entienda cómo se construyó el modelo y pueda modificarlo.
+- Salida compatible con la plataforma: siempre .glb, optimizado para web.
+
+3. COMPONENTES PREVISTOS
+-----------------------------------------------------------------------------
+- generador/          Servicio independiente (Python).
+  - prompts/          Instrucciones para que el LLM escriba código bpy.
+  - worker            Ejecuta Blender headless en una cola de trabajos.
+  - sandbox           Validación del script antes de ejecutarlo.
+  - exportador        Exporta .glb y genera miniatura (render).
+- API               Endpoints en FastAPI: crear trabajo, consultar estado,
+                    descargar resultado.
+- Frontend          Pantalla "Generar modelo": prompt, progreso, vista
+                    previa en A-Frame y descarga del .glb.
+
+4. RIESGOS A CONSIDERAR
+-----------------------------------------------------------------------------
+- Seguridad: el LLM genera código Python que se ejecuta en el servidor.
+  Es obligatorio aislarlo (contenedor sin red, límite de CPU/RAM/tiempo,
+  lista blanca de módulos: solo bpy, bmesh, mathutils, math).
+- Rendimiento: Blender + LLM en la instancia ARM gratuita puede ser lento.
+  Usar una cola de trabajos y límites por usuario.
+- Calidad: los LLM generan mejor geometría simple (low poly, primitivas,
+  modificadores). Empezar por ese estilo, que coincide con la identidad
+  visual "Cristal de amatista Low Poly".
+- Alternativas futuras: modelos abiertos de texto/imagen a 3D, usando
+  Blender solo para limpiar, optimizar y exportar.
+
+5. ORGANIZACIÓN DEL DESARROLLO
+-----------------------------------------------------------------------------
+- Se desarrollará en una rama propia (propuesta: feature/motor-generativo)
+  hasta que sea estable, sin bloquear el roadmap principal.
+- La línea principal sigue siendo: PWA offline -> lecciones -> WebXR ->
+  backend -> Tutor IA.
+- Scope sugerido para commits: gen
+    feat(gen): agregar worker de blender headless
+    feat(gen): crear prompt para generación de scripts bpy
