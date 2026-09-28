@@ -1,8 +1,8 @@
 =============================================================================
 BITÁCORA: RESUMEN DE AVANCE, REVISIÓN DE CÓDIGO Y REVISIÓN DE PROPUESTA
 PROYECTO: AMATISTA PWA
-FECHA: 28 DE SEPTIEMBRE DE 2026
-PERIODO CUBIERTO: 27 Y 28 DE SEPTIEMBRE DE 2026
+FECHA: 27 DE SEPTIEMBRE DE 2026
+PERIODO CUBIERTO: 27 DE SEPTIEMBRE DE 2026 (UTC-6)
 =============================================================================
 
 -----------------------------------------------------------------------------
@@ -26,16 +26,16 @@ PERIODO CUBIERTO: 27 Y 28 DE SEPTIEMBRE DE 2026
      restos de la plantilla de Vite (PR #6).
 
 [OK] Documentado el motor generativo 3D como rama aparte
-     (propuestas/motor_generativo_3d.txt).
+     (propuestas/2026-09-27_motor_generativo_3d.txt).
 
 [OK] Nueva visión de producto "Amatista 3D Lab"
-     (propuestas/amatista_3d_lab.txt).
+     (propuestas/2026-09-27_amatista_3d_lab.txt).
 
-[OK] Repositorio reorganizado (28/09). Los archivos que estaban sueltos en
+[OK] Repositorio reorganizado (27/09). Los archivos que estaban sueltos en
      la raíz se movieron a docs/, que ahora está dividido en:
        docs/arquitectura/   arquitectura general, backend/BD, recomendaciones
        docs/bitacora/       resúmenes y reportes por fecha
-       docs/incidencias/    errores resueltos (AAAA-MM-DD_tema.txt)
+       docs/incidencias/    errores resueltos
        docs/propuestas/     ideas y ramas futuras
      "docs/mit.txt" no era una licencia sino el reporte del App Shell; se
      movió a bitacora/2026-09-27_reporte_app_shell.txt.
@@ -97,7 +97,7 @@ Backend (revisado a partir de lo que describen las incidencias):
 Proceso:
   - Varios archivos se subieron con "Add files via upload" directo a
     main y a la raíz. Usar las carpetas de docs/ y la convención
-    type(scope): descripción (ver convencion_commits.txt).
+    type(scope): descripción (ver 2026-09-27_convencion_commits.txt).
   - No hay pruebas ni CI. Un workflow mínimo (lint + build del frontend)
     habría detectado la regresión.
 
