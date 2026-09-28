@@ -1,0 +1,132 @@
+=============================================================================
+INVESTIGACIÓN: ¿CÓMO SE ESTÁ DESARROLLANDO AMATISTA?
+PROYECTO: AMATISTA PWA
+FECHA: 27 DE SEPTIEMBRE DE 2026 (UTC-6)
+VERSIÓN ANALIZADA: v0.1.0 (merge del PR #8, commit fcc97f8)
+FUENTE: historial de Git de la rama main (commits, PRs y archivos)
+=============================================================================
+
+-----------------------------------------------------------------------------
+1. RESUMEN
+-----------------------------------------------------------------------------
+Amatista pasó de un repositorio vacío a una integración completa
+React -> FastAPI -> Oracle en unas 12 horas (11:24 a 23:17 del 27/09),
+con 2 personas, 26 commits y 8 pull requests.
+
+El avance es muy rápido y está bien documentado. Pero hay un desequilibrio:
+hay mucha más documentación que código en el repo, el backend vive solo
+en el servidor, los PRs se fusionan sin revisión y la visión del producto
+cambió 3 veces en el mismo día.
+
+-----------------------------------------------------------------------------
+2. LÍNEA DE TIEMPO (27/09, UTC-6)
+-----------------------------------------------------------------------------
+11:24  Kaneda343      Primer commit: inicialización de la PWA y arquitectura.
+14:16  MAXIMILIANO    Documentación, mind map y convención de commits.
+15:01  PR #1          Estructura base del monorepo.
+16:46  PR #2          .gitkeep, README inicial y .env.example.
+17:24  PR #3          App Shell con React, Tailwind y visor A-Frame.
+17:30  PR #4          Documentación del App Shell.
+17:44  MAXIMILIANO    Recomendaciones de arquitectura (directo a main).
+20:05  MAXIMILIANO    Arquitectura de base de datos y backend (directo a main).
+20:44  PR #5          Conexión CORS con FastAPI y Oracle.  <- HITO
+21:44  PR #6          Arreglos de Tailwind v4 e indicador de estado.
+22:15  MAXIMILIANO    Incidencia: puerto ocupado y CORS (subida web).
+22:49  MAXIMILIANO    Incidencia: ORA-01400 (subida web).
+22:56  PR #7          Flujo de sesiones en Oracle.  <- HITO (con regresión)
+23:12  MAXIMILIANO    Propuesta "Amatista 3D Lab" (subida web).
+23:17  PR #8          Organización de docs y corrección de la regresión.
+                      -> marcado como v0.1.0
+
+-----------------------------------------------------------------------------
+3. MÉTRICAS
+-----------------------------------------------------------------------------
+Commits (sin contar merges):
+  MAXIMILIANO1234345   9   documentación, producto y fusión de PRs
+  Kaneda343            7   código del frontend e integración
+  Claude               2   arreglos y organización
+
+Líneas agregadas por tipo (sin package-lock.json):
+  MAXIMILIANO1234345   ~1,150 de documentación, 0 de código
+  Kaneda343            ~460 de código, ~65 de documentación
+  Claude               ~20 de código (y ~225 borradas), ~250 de documentación
+
+Tamaño actual del repositorio:
+  Código de la aplicación   ~136 líneas (App.jsx 104 + api.js 32)
+  Documentación             ~1,200 líneas en docs/ + 615 en el README
+  Backend en el repo        0 líneas (main.py y requirements.txt vacíos)
+  -> Relación documentación / código: aproximadamente 13 a 1.
+
+Flujo de trabajo:
+  - 10 de 18 commits fueron directo a main, sin PR (todos de
+    documentación, 3 con el mensaje genérico "Add files via upload").
+  - 9 de 18 commits siguen la convención type(scope): descripción (50%).
+    Los de Kaneda343 la cumplen al 100%.
+  - Tiempo entre el último commit de un PR y su merge: 1 a 2 minutos en
+    los PRs #1, #2, #3, #4, #5 y #7. Es decir, no hay revisión real.
+  - La rama dev quedó 6 commits detrás de main. Por eso el PR #7 se hizo
+    sobre código viejo y deshizo un arreglo del PR #6 (regresión).
+  - Pruebas automáticas: 0.  CI: no existe.
+
+-----------------------------------------------------------------------------
+4. LO QUE VA BIEN
+-----------------------------------------------------------------------------
+- Velocidad: en un día se llegó a la integración completa con Oracle, que
+  suele ser la parte más lenta.
+- Cultura de documentación: las incidencias explican causa, solución y
+  resultado. Esto es poco común y muy valioso.
+- El código entra por PRs desde dev y con buenos mensajes de commit.
+- Roles claros: una persona lleva producto y documentación, la otra el
+  código.
+
+-----------------------------------------------------------------------------
+5. RIESGOS DETECTADOS
+-----------------------------------------------------------------------------
+1. El servidor es la "fuente de verdad" del backend, no el repositorio.
+   main.py, los modelos, connection.py y force_reset.py solo existen en el
+   servidor ARM. Nadie puede revisarlos ni recuperarlos si el servidor
+   falla.
+2. Sin revisión ni CI, los errores llegan a main. La regresión del
+   indicador de estado es la prueba.
+3. La rama dev se desincroniza de main, porque la documentación se sube
+   directo a main y dev no se actualiza.
+4. El alcance cambia muy rápido. En un solo día el proyecto pasó de
+   "plataforma educativa offline" a "motor generativo 3D" y luego a
+   "Amatista 3D Lab". El README sigue describiendo la primera visión.
+5. La funcionalidad principal según el README (trabajar sin conexión)
+   todavía no tiene código: manifest.json y sw.js están vacíos.
+
+-----------------------------------------------------------------------------
+6. RECOMENDACIONES
+-----------------------------------------------------------------------------
+Proceso (esta semana):
+  a. Proteger main en GitHub (Settings -> Branches): exigir PR y que pase
+     el CI antes de fusionar.
+  b. Crear un workflow de GitHub Actions con "npm ci && npm run lint &&
+     npm run build" para el frontend.
+  c. Antes de empezar a trabajar: "git checkout dev && git pull origin
+     main". O trabajar en ramas cortas creadas desde main.
+  d. Subir los documentos también por PR, en docs/ y con nombre
+     AAAA-MM-DD_tema.txt.
+  e. Que la persona que no escribió el código revise el PR al menos
+     5 minutos antes de fusionarlo.
+
+Producto:
+  f. Elegir UNA visión (educativa o 3D Lab) y reflejarla en el README.
+  g. Definir la meta de la siguiente versión antes de empezar.
+
+Propuesta de meta para v0.2.0:
+  [ ] Código del backend en backend/ (main.py, database/, requirements.txt).
+  [ ] .env.example con todas las variables reales (DB_PORT, DB_SERVICE).
+  [ ] manifest.json y service worker funcionando (PWA instalable).
+  [ ] A-Frame instalado con npm y disponible sin conexión.
+  [ ] CI con lint y build.
+
+-----------------------------------------------------------------------------
+7. CÓMO REPETIR ESTE ANÁLISIS
+-----------------------------------------------------------------------------
+  git shortlog -sn --no-merges main
+  git log --first-parent --no-merges --format='%h %an %s' main
+  git rev-list --count dev..main
+  git log --no-merges --format='%s' main | grep -cE '^(feat|fix|docs|chore)'
+=============================================================================

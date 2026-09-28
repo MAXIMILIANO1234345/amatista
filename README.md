@@ -145,9 +145,9 @@ amatista/
 ├── docs/
 │   ├── arquitectura/      # arquitectura general, backend/BD, recomendaciones, mindmap
 │   ├── bitacora/          # resúmenes y reportes de avance por fecha
-│   ├── incidencias/       # errores resueltos (AAAA-MM-DD_tema.txt)
+│   ├── incidencias/       # errores resueltos
 │   ├── propuestas/        # ideas y ramas futuras (3D Lab, motor generativo)
-│   └── convencion_commits.txt
+│   └── 2026-09-27_convencion_commits.txt
 │
 ├── .env.example
 ├── .gitignore
@@ -284,7 +284,7 @@ La intención es mantener inicialmente una estructura sencilla y expandirla úni
 La información técnica sobre la conexión y arquitectura de Oracle se encuentra documentada dentro de:
 
 ```text
-docs/arquitectura/backend_y_base_de_datos.txt
+docs/arquitectura/2026-09-27_backend_y_base_de_datos.txt
 ```
 
 ---
@@ -330,7 +330,7 @@ Visor A-Frame / WebXR
 Este módulo se desarrollará en una **rama independiente** y no cambia el roadmap principal. Detalles en:
 
 ```text
-docs/propuestas/motor_generativo_3d.txt
+docs/propuestas/2026-09-27_motor_generativo_3d.txt
 ```
 
 ---
@@ -524,7 +524,7 @@ chore(repo): actualizar dependencias
 La documentación completa se encuentra en:
 
 ```text
-docs/convencion_commits.txt
+docs/2026-09-27_convencion_commits.txt
 ```
 
 ---
@@ -544,10 +544,14 @@ Incluye:
 - arquitectura de backend;
 - arquitectura de base de datos;
 - convención de commits;
-- mapa conceptual (`docs/arquitectura/mindmap.png`);
+- mapa conceptual (`docs/arquitectura/2026-09-27_mindmap.png`);
 - incidencias resueltas (`docs/incidencias/`);
 - bitácora de avances (`docs/bitacora/`);
 - propuestas de producto: Amatista 3D Lab y motor generativo 3D (`docs/propuestas/`).
+
+Todos los archivos dentro de `docs/` se nombran con su fecha de creación al inicio: `AAAA-MM-DD_tema.txt`. Así se ordenan solos por fecha dentro de cada carpeta.
+
+El historial de versiones está en `CHANGELOG.md`. Cada versión se marca con un tag de Git (`v0.1.0`, `v0.2.0`, ...).
 
 ---
 
@@ -575,7 +579,7 @@ Amatista se encuentra actualmente en desarrollo.
 Antes de contribuir se recomienda consultar:
 
 ```text
-docs/convencion_commits.txt
+docs/2026-09-27_convencion_commits.txt
 ```
 
 Las contribuciones deben mantener la separación de responsabilidades del monorepo y evitar introducir dependencias innecesarias entre frontend, backend e IA.
