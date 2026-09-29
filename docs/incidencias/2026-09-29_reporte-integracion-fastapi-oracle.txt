@@ -1,0 +1,116 @@
+Reporte Técnico: Resolución de Incidencias de Integración (FastAPI + Oracle Cloud + React)
+1. Resumen Ejecutivo del Proceso
+Durante la integración del frontend de React (Vite) con el backend de FastAPI desplegado en un servidor Linux en Oracle Cloud Infrastructure (OCI), nos enfrentamos a una cadena de bloqueos técnicos relacionados con tipos de datos incompatibles en Oracle Database, metadatos persistentes en caché y referencias de esquemas.
+
+Este reporte detalla cronológicamente el estado del sistema, los errores encontrados, las causas raíz y la arquitectura actual de la base de datos y el backend.
+
+2. Estado Actual de las Tablas en Oracle Cloud (ADMIN)
+Tras las iteraciones de limpieza y reestructuración, la base de datos en Oracle Cloud cuenta con la siguiente estructura oficial operativa:
+
+USUARIOS (Creada para mantener integridad referencial opcional):
+
+id: VARCHAR2(100) (Clave primaria, almacena identificadores de tipo texto como correos electrónicos).
+
+nombre: VARCHAR2(150)
+
+creado_en: TIMESTAMP
+
+SESIONES_WEB (Tabla definitiva para el registro de accesos de usuarios):
+
+id: VARCHAR2(50) (Clave primaria basada en UUID).
+
+usuario_id: VARCHAR2(150) (Almacena el correo/ID de texto del usuario logueado).
+
+dispositivo: VARCHAR2(200) (Información del User-Agent del navegador).
+
+activa: NUMBER(1) (Bandera de estado de sesión, 1 para activa).
+
+ultimo_acceso: TIMESTAMP (Marca de tiempo automática con CURRENT_TIMESTAMP).
+
+3. Secuencia de Errores y Causas Raíz Identificadas
+Incidencia A: El conflicto de tipos ORA-01722: invalid number
+Qué pasó: El sistema intentaba insertar el correo electrónico del usuario (ej. alumno_prueba@amatista.local) dentro de una columna (usuario_id) que originalmente había sido concebida o interpretada por Oracle como de tipo numérico (NUMBER).
+
+Por qué ocurrió: Al encontrar caracteres alfabéticos como la letra 'a', Oracle intentaba convertir el texto a número por la fuerza, arrojando el error de conversión inválida.
+
+Incidencia B: El bloqueo por restricciones ORA-02267
+Qué pasó: Al intentar modificar el tipo de dato de la columna directamente mediante un comando ALTER TABLE, Oracle bloqueaba la operación debido a llaves foráneas o dependencias de metadatos cruzadas con otras tablas del esquema.
+
+Por qué ocurrió: Las restricciones de integridad referencial impedían alterar la estructura sin antes purgar las dependencias y restricciones lógicas.
+
+Incidencia C: El error fantasma de caché ORA-00942: table or view does not exist
+Qué pasó: A pesar de haber recreado tablas, el motor en ocasiones no las encontraba o mantenía referencias cruzadas de esquemas.
+
+Por qué ocurrió: El motor autónomo de Oracle maneja un diccionario de datos estrictamente case-sensitive y un almacenamiento en caché interno de metadatos. La solución definitiva requirió nombrar explícitamente el esquema propietario (ADMIN.SESIONES_WEB).
+
+4. Arquitectura de Solución Implementada (main.py)
+Para garantizar la estabilidad del servidor Uvicorn en el entorno virtual (venv) de OCI, se estructuró un endpoint blindado que captura excepciones de base de datos e imprime el traceback detallado en la terminal SSH ante cualquier eventualidad:
+
+Python
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import create_engine, text
+import json
+import uuid
+import traceback
+
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Configuración de Conexión a Oracle Cloud
+USUARIO = "ADMIN"
+PASSWORD = "TU_CONTRASEÑA_AQUI"
+DSN = "TU_CADENA_DE_CONEXION_GIGANTE_AQUI"
+
+DATABASE_URL = f"oracle+oracledb://{USUARIO}:{PASSWORD}@{DSN}"
+engine = create_engine(DATABASE_URL)
+
+@app.post("/api/iniciar-sesion")
+def iniciar_sesion(datos: dict):
+    try:
+        usuario_id = str(datos.get("usuario_id") or datos.get("email") or "estudiante@amatista.lab")
+        dispositivo = str(datos.get("dispositivo", "web"))
+
+        with engine.begin() as conn:
+            sesion_id = str(uuid.uuid4())[:30]
+            
+            # Apuntando de forma explícita al esquema ADMIN y la tabla limpia
+            query = text("""
+                INSERT INTO ADMIN.SESIONES_WEB (id, usuario_id, dispositivo, activa, ultimo_acceso)
+                VALUES (:id, :user_id, :dispositivo, 1, CURRENT_TIMESTAMP)
+            """)
+            
+            conn.execute(query, {
+                "id": sesion_id,
+                "user_id": usuario_id,
+                "dispositivo": dispositivo
+            })
+            
+            return {
+                "status": "success", 
+                "sesion_id": sesion_id, 
+                "mensaje": "Sesión registrada correctamente"
+            }
+                
+    except Exception as e:
+        print("--- ERROR EXACTO EN /api/iniciar-sesion ---")
+        traceback.print_exc()
+        print("---------------------------------------------")
+        raise HTTPException(status_code=500, detail=f"Error en base de datos: {str(e)}")
+5. Próximos Pasos Recomendados
+Verificar que la tabla ADMIN.SESIONES_WEB esté creada ejecutando el bloque SQL correspondiente en el panel de Oracle.
+
+Iniciar el servicio backend utilizando el entorno virtual activo:
+
+Bash
+cd ~/amatista/backend
+source venv/bin/activate
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+Probar el inicio de sesión desde el cliente web de React para confirmar el código de respuesta 200 OK.

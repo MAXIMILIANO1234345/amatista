@@ -5,11 +5,20 @@ Todas las versiones de Amatista. Formato basado en [Keep a Changelog](https://ke
 ## [Sin publicar]
 
 ### Cambiado
+- La lección "El Pipeline" usa una ilustración en lugar de un video con URL de ejemplo.
+- A-Frame se descarga solo al usar el laboratorio o una vista 3D, y queda en caché para usarse sin conexión.
 - Los documentos de `docs/` se nombran con su fecha de creación (`AAAA-MM-DD_tema.txt`).
 - La bitácora del 27/09 se fechó en hora local (UTC-6).
 
 ### Agregado
-- Identidad visual low poly estilo videojuego y pantalla de inicio "Elige tu curso" (Blender disponible, A-Frame bloqueado).
+- Módulo 1 de Blender ("El mundo 3D y la magia de Blender") y de A-Frame ("La web en 3D"), con el contenido del equipo. A-Frame pasa a estar disponible.
+- Mapa del módulo con lecciones que se desbloquean en orden, y reproductor de lecciones: markdown, línea de tiempo, tarjetas de concepto que se voltean, pipeline ilustrado, capas, avisos, código con vista 3D en vivo de A-Frame y examen.
+- Progreso local en IndexedDB con XP e insignias; se sincroniza con `/api/progreso` cuando el backend responde.
+- Ilustraciones low poly en SVG generadas con `npm run ilustraciones`.
+- Backend en el repositorio: FastAPI + SQLAlchemy (Oracle o SQLite), rutas de sesiones, progreso y salud, 14 pruebas.
+- `backend/sql/001_esquema_amatista.sql` y `backend/diagnostico_oracle.py` para dejar Oracle consistente.
+- Laboratorio técnico: muestra por separado el estado del backend y el de la base de datos.
+- Identidad visual low poly estilo videojuego y pantalla de inicio "Elige tu curso".
 - PWA instalable: manifest, íconos y service worker con `vite-plugin-pwa`. La pantalla de cursos funciona sin conexión.
 - A-Frame y las fuentes (Outfit, JetBrains Mono) instalados con npm en lugar de CDN.
 - Laboratorio técnico en `#/laboratorio`: el panel de Oracle y el visor A-Frame se cargan bajo demanda.

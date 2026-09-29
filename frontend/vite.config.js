@@ -5,7 +5,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 // https://vite.dev/config/
 export default defineConfig({
   build: {
-    // El chunk del laboratorio incluye A-Frame (~1.3 MB) y se carga bajo demanda.
+    // El chunk de A-Frame (~1.3 MB) se carga bajo demanda.
     chunkSizeWarningLimit: 1400,
   },
   plugins: [
@@ -37,17 +37,18 @@ export default defineConfig({
       workbox: {
         // Precache: la pantalla de cursos completa (HTML, JS, CSS, fuentes, íconos).
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
-        // A-Frame vive en el chunk del laboratorio: se guarda al usarlo por primera vez.
+        // A-Frame (~1.3 MB) no se precachea: se guarda la primera vez que se usa
+        // (laboratorio o vista 3D de una lección) y desde ahí funciona sin conexión.
         globIgnores: [
-          '**/Laboratorio-*.js',
+          '**/aframe-master*.js',
           // Alfabetos que no usamos: el navegador no los descarga y no deben precachearse.
           '**/*-{cyrillic,cyrillic-ext,greek,vietnamese}-*.woff2',
         ],
         runtimeCaching: [
           {
-            urlPattern: ({ url }) => url.pathname.startsWith('/assets/Laboratorio-'),
+            urlPattern: ({ url }) => url.pathname.startsWith('/assets/aframe-master'),
             handler: 'CacheFirst',
-            options: { cacheName: 'amatista-laboratorio', expiration: { maxEntries: 4 } },
+            options: { cacheName: 'amatista-aframe', expiration: { maxEntries: 2 } },
           },
         ],
         navigateFallback: '/index.html',

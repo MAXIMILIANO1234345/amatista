@@ -1,0 +1,85 @@
+=============================================================================
+FORMATO DE LAS LECCIONES: CÓMO AGREGAR UN MÓDULO
+PROYECTO: AMATISTA PWA
+FECHA: 29 DE SEPTIEMBRE DE 2026 (UTC-6)
+=============================================================================
+
+1. DÓNDE VIVE EL CONTENIDO
+-----------------------------------------------------------------------------
+frontend/src/data/modulos/*.json     Un archivo por módulo (lecciones y examen).
+frontend/src/data/cursos.js          Catálogo: qué módulos tiene cada curso.
+frontend/public/ilustraciones/       Imágenes de las lecciones (SVG o PNG).
+
+Para publicar un módulo nuevo:
+  1. Crear frontend/src/data/modulos/blender-modulo-2.json con el formato de
+     abajo (el de los JSON del Módulo 1).
+  2. En cursos.js, importarlo y ponerlo en "contenido" del módulo:
+       import blenderModulo2 from './modulos/blender-modulo-2.json';
+       { titulo: 'Interfaz y navegación', insignia: 'Navegante',
+         contenido: blenderModulo2.module },
+  3. npm run build. El módulo queda disponible sin conexión.
+
+2. ESTRUCTURA DE UN MÓDULO
+-----------------------------------------------------------------------------
+{
+  "module": {
+    "id": "...", "title": "Módulo 2: ...", "description": "...",
+    "estimatedTimeMinutes": 40,
+    "lessons": [
+      {
+        "id": "les_005",                  ← único en todo el curso
+        "title": "...",
+        "type": "theory_reading",         ← ver tipos abajo
+        "durationSeconds": 420,
+        "isLocked": false,                ← true = se abre al completar la anterior
+        "cover": { "src": "ilustraciones/x.svg", "alt": "..." },   (opcional)
+        "contentBlocks": [ ... ]
+      },
+      { "id": "les_008", "type": "exam", "isLocked": true,
+        "quizData": { "passingScore": 80, "questions": [ ... ] } }
+    ]
+  }
+}
+
+IMPORTANTE: no cambiar el "id" de una lección ya publicada. El progreso de
+los alumnos se guarda con ese id.
+
+Tipos de lección: theory_reading (Lectura), theory_interactive (Interactiva),
+video_lesson (Video), code_interactive (Código), exam (Examen).
+
+3. BLOQUES DE CONTENIDO ("contentBlocks")
+-----------------------------------------------------------------------------
+markdown_text   { "body": "### Título\nTexto con **negritas**, *cursivas* y `código`" }
+image           { "src": "ilustraciones/x.svg", "alt": "...", "caption": "..." }
+concept_cards   { "items": [{ "term", "definition", "image", "alt" }] }
+                Tarjetas que se voltean. La lección se completa al voltearlas todas.
+timeline        { "title", "items": [{ "year", "title", "text", "icon" }] }
+pipeline        { "title", "steps": [{ "icon", "title", "text" }] }
+layers          { "title", "items": [{ "title", "text" }], "footer" }
+callout         { "variant": "dato" | "reto", "title", "body" }
+code_snippet    { "language": "html", "code": "...", "preview": true }
+                Con "preview": true el alumno puede editar el código y ver la
+                escena A-Frame en vivo (solo se copian etiquetas <a-…>).
+video_player    { "url": "videos/x.mp4" }   Usar solo con videos reales.
+
+Íconos disponibles (timeline y pipeline): modelar, texturizar, rigging, animar,
+iluminar, render, estudio, empresa, monedas, libre, reto.
+
+4. EXÁMENES
+-----------------------------------------------------------------------------
+"questions": [{
+  "id": "q_01", "questionText": "...",
+  "options": [{ "id": "opt_a", "text": "...", "isCorrect": false }, ...],
+  "feedbackCorrect": "...", "feedbackIncorrect": "..."
+}]
+El orden de las opciones cambia en cada intento. Aprobar el examen completa
+el módulo y desbloquea su insignia (campo "insignia" en cursos.js).
+
+5. ILUSTRACIONES
+-----------------------------------------------------------------------------
+Las del Módulo 1 se generan con: cd frontend && npm run ilustraciones
+(frontend/scripts/ilustraciones.mjs). También se puede usar cualquier SVG o
+PNG, por ejemplo un render de Blender: guardarlo en public/ilustraciones/ y
+referenciarlo desde el JSON. Tamaño sugerido: 640 × 360 para portadas y
+320 × 240 para tarjetas.
+=============================================================================

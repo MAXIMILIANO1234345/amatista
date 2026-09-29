@@ -1,0 +1,91 @@
+=============================================================================
+DIAGNÓSTICO: POR QUÉ ORACLE NO GUARDA SESIONES NI PROGRESO
+PROYECTO: AMATISTA PWA
+FECHA: 29 DE SEPTIEMBRE DE 2026 (UTC-6)
+REVISA: 2026-09-29_reporte-integracion-fastapi-oracle.txt y la captura del
+        esquema ADMIN en Database Actions
+=============================================================================
+
+1. LO QUE MUESTRA LA CAPTURA DEL ESQUEMA ADMIN
+-----------------------------------------------------------------------------
+Tablas que existen: DBTOOLS$EXECUTION_HISTORY (de Oracle), PROGRESO_LECCIONES,
+SESIONES (ID, USUARIO_ID, DISPOSITIVO, ACTIVA, ULTIMO_ACCESO) y USUARIOS.
+
+NO existe la tabla SESIONES_WEB. Sin embargo, el main.py del reporte inserta
+en ADMIN.SESIONES_WEB.
+
+2. CAUSAS REALES (CORRIGEN EL REPORTE)
+-----------------------------------------------------------------------------
+ORA-00942 table or view does not exist
+  El reporte lo atribuye a un "caché de metadatos". La causa es más simple:
+  la tabla SESIONES_WEB no existe en el esquema (ver la captura). Oracle no
+  tiene un caché que oculte tablas recién creadas. Otra causa posible es
+  crear una tabla con comillas y en minúsculas ("sesiones_web"): entonces
+  solo se encuentra escribiéndola exactamente igual, con comillas.
+
+ORA-01722 invalid number
+  Correcto en el reporte: se guarda un correo en una columna NUMBER. Viene
+  del diseño anterior (27/09), cuando USUARIOS.ID era un número
+  autoincremental y SESIONES.USUARIO_ID apuntaba a él.
+
+ORA-02267 column type incompatible with referenced column type
+  No es un bloqueo de ALTER TABLE. Oracle lo da al crear una llave foránea
+  entre columnas de tipos distintos, por ejemplo SESIONES.USUARIO_ID
+  VARCHAR2 → USUARIOS.ID NUMBER. Los dos lados deben tener el mismo tipo.
+
+Conclusión: el esquema quedó mezclado entre dos diseños (ID numérico y ID
+de texto) y el código apunta a una tabla que no existe. Parchar tabla por
+tabla con ALTER seguiría chocando con las llaves foráneas.
+
+3. SOLUCIÓN IMPLEMENTADA
+-----------------------------------------------------------------------------
+a) backend/sql/001_esquema_amatista.sql
+   Borra USUARIOS, SESIONES, SESIONES_WEB y PROGRESO_LECCIONES (también si
+   se crearon con comillas) y las recrea con un solo diseño: todos los
+   identificadores de usuario son VARCHAR2, así que caben correos y UUID y
+   las llaves foráneas coinciden.
+
+b) El backend ahora está en el repositorio (backend/)
+   main.py, database/ (conexión y modelos) y api/ (sesiones y progreso).
+   Usa la tabla SESIONES (ya no SESIONES_WEB). Registra el error completo en
+   la terminal y devuelve al navegador el código ORA-xxxxx.
+
+c) backend/diagnostico_oracle.py
+   Se conecta, muestra usuario y esquema, y compara las tablas reales con
+   las esperadas. Explica en español errores de conexión comunes (ACL,
+   contraseña, servicio, TLS).
+
+d) El progreso ya no depende de Oracle
+   La PWA guarda el progreso en el dispositivo (IndexedDB) y lo envía a
+   /api/progreso cuando el servidor responde. Si Oracle falla, el alumno no
+   pierde nada: queda pendiente y se reintenta.
+
+4. PASOS PARA DEJARLO FUNCIONANDO
+-----------------------------------------------------------------------------
+Detallados en backend/README.md, sección "Dejar Oracle funcionando":
+  1. Respaldar backend/ en el servidor y actualizar con git.
+  2. pip install -r requirements.txt
+  3. Revisar backend/.env (sirve el actual con DB_HOST/DB_PORT/DB_SERVICE).
+  4. Ejecutar el script SQL en Database Actions con "Ejecutar script" (F5).
+  5. python diagnostico_oracle.py  → debe decir que las tablas coinciden.
+  6. Arrancar uvicorn y abrir /api/salud → {"estado":"ok","motor":"oracle"}.
+  7. En la app, el Laboratorio técnico (#/laboratorio) muestra el estado real
+     de la base de datos y el error ORA si lo hay.
+
+5. VERIFICACIÓN REALIZADA
+-----------------------------------------------------------------------------
+- 14 pruebas automáticas del backend con SQLite (pytest), incluyendo el
+  camino de error de base de datos, CORS y la comparación del diagnóstico.
+- Las consultas y el DSN se compilaron con el dialecto de Oracle
+  (SELECT ... FROM DUAL, conexión tcps con verificación del certificado).
+- Prueba de punta a punta: la PWA sincronizó 4 lecciones con el backend.
+- No se pudo probar contra la base real: la ACL solo acepta la IP del
+  servidor ARM. Ese paso queda para ejecutarse en el servidor.
+
+6. PENDIENTES DE SEGURIDAD
+-----------------------------------------------------------------------------
+- Crear un usuario de aplicación en lugar de usar ADMIN.
+- Autenticación real: hoy cualquiera puede enviar progreso con un id.
+- HTTPS en el backend antes de publicar el frontend en Cloudflare Pages
+  (el navegador bloquea llamadas https → http).
+=============================================================================
