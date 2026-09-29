@@ -1,0 +1,245 @@
+{
+  "module": {
+    "id": "mod_teoria_001",
+    "courseId": "crs_blender_fundamentos",
+    "title": "Módulo 1: El mundo 3D y la magia de Blender (Teoría esencial)",
+    "slug": "modulo-1-teoria-esencial-blender",
+    "description": "Antes de correr, hay que aprender a caminar. En este módulo descubriremos qué es Blender, su historia de película, y traduciremos el 'idioma 3D' a términos sencillos para que no te pierdas cuando empecemos a diseñar.",
+    "estimatedTimeMinutes": 45,
+    "order": 1,
+    "lessons": [
+      {
+        "id": "les_001",
+        "title": "La rebelión del software: Historia de Blender",
+        "slug": "historia-de-blender",
+        "type": "theory_reading",
+        "durationSeconds": 420,
+        "isLocked": false,
+        "contentBlocks": [
+          {
+            "type": "markdown_text",
+            "body": "### De un estudio quebrado a dominar el mundo\nEl manual de Blender nos cuenta una historia increíble. En 1995, Ton Roosendaal comenzó a escribir Blender para su estudio de animación holandés, *NeoGeo*. Más tarde fundó *NaN* para comercializarlo, pero tras la crisis económica de 2001, la empresa quebró y el desarrollo de Blender se detuvo."
+          },
+          {
+            "type": "markdown_text",
+            "body": "### La campaña 'Free Blender'\nTon no quería dejar morir el proyecto. En 2002, lanzó una loca campaña de crowdfunding (antes de que existiera Kickstarter). Pidió a la comunidad **100,000 €** para comprarle el código fuente a los inversores y liberarlo. ¡Lo lograron en solo 7 semanas! Hoy, Blender es 100% de código abierto (GPL) y pertenece a todos nosotros."
+          },
+          {
+            "type": "timeline",
+            "title": "La historia en cuatro momentos",
+            "items": [
+              {
+                "year": "1995",
+                "icon": "estudio",
+                "title": "Nace en NeoGeo",
+                "text": "Ton Roosendaal empieza a escribir Blender para su estudio de animación holandés."
+              },
+              {
+                "year": "1998",
+                "icon": "empresa",
+                "title": "Llega NaN",
+                "text": "Ton funda la empresa Not a Number (NaN) para desarrollar y comercializar Blender."
+              },
+              {
+                "year": "2002",
+                "icon": "monedas",
+                "title": "Campaña Free Blender",
+                "text": "NaN cierra tras la crisis. La comunidad reúne 100 000 € en 7 semanas para comprar el código."
+              },
+              {
+                "year": "13 oct 2002",
+                "icon": "libre",
+                "title": "¡Blender es libre!",
+                "text": "Se publica como código abierto (GPL). Hoy lo cuida la Blender Foundation junto con su comunidad."
+              }
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "dato",
+            "title": "¿Sabías que…?",
+            "body": "Blender es gratis para siempre y **todo lo que crees con él es tuyo**, incluso si lo vendes. La licencia GPL protege el programa, no tus modelos."
+          }
+        ],
+        "cover": {
+          "src": "ilustraciones/blender-historia.svg",
+          "alt": "Un candado abierto sobre una colina al amanecer, rodeado de personas y monedas que caen."
+        }
+      },
+      {
+        "id": "les_002",
+        "title": "Diccionario 3D para Humanos",
+        "slug": "conceptos-basicos-3d",
+        "type": "theory_interactive",
+        "durationSeconds": 600,
+        "isLocked": true,
+        "contentBlocks": [
+          {
+            "type": "markdown_text",
+            "body": "El manual oficial menciona que te encontrarás con mucha jerga. No te asustes, aquí te la traducimos a lenguaje de mortales:"
+          },
+          {
+            "type": "concept_cards",
+            "items": [
+              {
+                "term": "Malla (Mesh)",
+                "definition": "Es el 'cascarón' de tus objetos. Imagina que es la estructura de alambre cubierta de papel maché. Todo lo que modelas es una malla.",
+                "image": "ilustraciones/concepto-malla.svg",
+                "alt": "Una esfera low poly: la mitad izquierda es solo alambre y la derecha tiene sus caras cubiertas."
+              },
+              {
+                "term": "Materiales y Shaders",
+                "definition": "Si la malla es el objeto, el material es de qué está hecho. ¿Es madera, cristal, metal? Los 'Shaders' son instrucciones matemáticas que le dicen a la computadora cómo reaccionar a la luz.",
+                "image": "ilustraciones/concepto-materiales.svg",
+                "alt": "Tres esferas con el mismo modelo y distinto material: madera, cristal y metal."
+              },
+              {
+                "term": "Render (Procesamiento)",
+                "definition": "Es el momento de 'tomar la foto' o 'grabar el video'. La computadora calcula toda la luz, sombras y colores de tu escena y genera una imagen final.",
+                "image": "ilustraciones/concepto-render.svg",
+                "alt": "Una cámara 3D apuntando a una escena y la foto final que produce."
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "les_003",
+        "title": "El Pipeline (Flujo de trabajo 3D)",
+        "slug": "pipeline-3d",
+        "type": "theory_reading",
+        "durationSeconds": 300,
+        "isLocked": true,
+        "contentBlocks": [
+          {
+            "type": "markdown_text",
+            "body": "El **Pipeline** es la línea de ensamblaje. Primero se **Modela** (dar forma), luego se **Texturiza** (dar color), se le pone un **Esqueleto (Rigging)** si se va a mover, se **Anima**, se **Ilumina** y finalmente se hace el **Render**."
+          },
+          {
+            "type": "pipeline",
+            "title": "La línea de ensamblaje del 3D",
+            "steps": [
+              {
+                "icon": "modelar",
+                "title": "Modelar",
+                "text": "Dar forma a la malla."
+              },
+              {
+                "icon": "texturizar",
+                "title": "Texturizar",
+                "text": "Darle color y material."
+              },
+              {
+                "icon": "rigging",
+                "title": "Rigging",
+                "text": "Ponerle un esqueleto para poder moverlo."
+              },
+              {
+                "icon": "animar",
+                "title": "Animar",
+                "text": "Crear el movimiento con fotogramas clave."
+              },
+              {
+                "icon": "iluminar",
+                "title": "Iluminar",
+                "text": "Colocar luces para crear el ambiente."
+              },
+              {
+                "icon": "render",
+                "title": "Render",
+                "text": "La computadora «toma la foto» final."
+              }
+            ]
+          },
+          {
+            "type": "callout",
+            "variant": "dato",
+            "title": "El pipeline de Amatista",
+            "body": "En esta ruta usaremos una versión corta: **Modelar → Texturizar → Exportar GLB → verlo en la web con A-Frame**."
+          }
+        ]
+      },
+      {
+        "id": "les_004",
+        "title": "Examen: Fundamentos del 3D",
+        "slug": "examen-modulo-1",
+        "type": "exam",
+        "isLocked": true,
+        "quizData": {
+          "passingScore": 80,
+          "questions": [
+            {
+              "id": "q_01",
+              "questionText": "¿Qué hito histórico ocurrió en 2002 que salvó a Blender de desaparecer?",
+              "options": [
+                {
+                  "id": "opt_a",
+                  "text": "Una gran empresa tecnológica lo compró.",
+                  "isCorrect": false
+                },
+                {
+                  "id": "opt_b",
+                  "text": "La comunidad recaudó 100,000 € para liberarlo como código abierto.",
+                  "isCorrect": true
+                },
+                {
+                  "id": "opt_c",
+                  "text": "Ganó un premio en la conferencia SIGGRAPH.",
+                  "isCorrect": false
+                }
+              ],
+              "feedbackCorrect": "¡Exacto! La campaña 'Free Blender' fue un éxito rotundo y sentó las bases de lo que es hoy.",
+              "feedbackIncorrect": "No del todo. Recuerda la historia de Ton Roosendaal y cómo la comunidad salvó el proyecto económicamente."
+            },
+            {
+              "id": "q_02",
+              "questionText": "Si alguien te dice que 'está modificando la Malla (Mesh)' de un modelo, ¿qué está haciendo realmente?",
+              "options": [
+                {
+                  "id": "opt_a",
+                  "text": "Está cambiando los colores y texturas del objeto.",
+                  "isCorrect": false
+                },
+                {
+                  "id": "opt_b",
+                  "text": "Está alterando la estructura geométrica base (la forma) del objeto.",
+                  "isCorrect": true
+                },
+                {
+                  "id": "opt_c",
+                  "text": "Está tomando la fotografía final (Render).",
+                  "isCorrect": false
+                }
+              ],
+              "feedbackCorrect": "¡Muy bien! La malla es la geometría fundamental.",
+              "feedbackIncorrect": "Ojo con los términos. Recuerda que la malla es el equivalente al 'esqueleto de alambre' de la figura."
+            },
+            {
+              "id": "q_03",
+              "questionText": "En el flujo de trabajo (Pipeline) tradicional 3D, ¿cuál es el paso final para obtener una imagen terminada?",
+              "options": [
+                {
+                  "id": "opt_a",
+                  "text": "Modelado",
+                  "isCorrect": false
+                },
+                {
+                  "id": "opt_b",
+                  "text": "Texturizado",
+                  "isCorrect": false
+                },
+                {
+                  "id": "opt_c",
+                  "text": "Render (Procesamiento)",
+                  "isCorrect": true
+                }
+              ],
+              "feedbackCorrect": "¡Correcto! El Render es cuando la computadora calcula todas las luces y materiales para entregar la imagen 2D final.",
+              "feedbackIncorrect": "Recuerda cuál es la etapa donde 'tomamos la foto' después de haber acomodado todo."
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

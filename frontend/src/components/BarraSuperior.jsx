@@ -1,10 +1,12 @@
 import { CristalLogo } from './Iconos';
 import { useConexion } from '../hooks/useConexion';
 import { useInstalarPWA } from '../hooks/useInstalarPWA';
+import { useProgreso } from '../progreso/contexto';
 
 function BarraSuperior() {
   const enLinea = useConexion();
   const instalar = useInstalarPWA();
+  const { xp } = useProgreso();
 
   return (
     <header className="sticky top-0 z-20 border-b border-white/5 bg-base/80 backdrop-blur-md">
@@ -27,6 +29,12 @@ function BarraSuperior() {
             </button>
           )}
           <span
+            className="corte-poly-sm flex items-center gap-1.5 border border-amatista/40 bg-amatista/15 px-3 py-1.5 font-mono text-xs font-bold uppercase tracking-wider text-amatista-claro"
+            title="Experiencia ganada al completar lecciones"
+          >
+            <span aria-hidden="true">◆</span> {xp} XP
+          </span>
+          <span
             role="status"
             className={`corte-poly-sm flex items-center gap-2 border px-3 py-1.5 font-mono text-xs uppercase tracking-wider ${
               enLinea
@@ -35,7 +43,8 @@ function BarraSuperior() {
             }`}
           >
             <span className={`h-2 w-2 rotate-45 ${enLinea ? 'bg-neon animar-pulso' : 'bg-amatista-claro'}`} />
-            {enLinea ? 'En línea' : 'Sin conexión'}
+            <span className="hidden sm:inline">{enLinea ? 'En línea' : 'Sin conexión'}</span>
+            <span className="sr-only sm:hidden">{enLinea ? 'En línea' : 'Sin conexión'}</span>
           </span>
         </div>
       </div>

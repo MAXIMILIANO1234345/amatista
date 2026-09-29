@@ -3,18 +3,26 @@ import BarraSuperior from './components/BarraSuperior';
 import FondoLowPoly from './components/FondoLowPoly';
 import { CristalLogo } from './components/Iconos';
 import Inicio from './pages/Inicio';
+import ProgresoProvider from './progreso/ProgresoProvider';
+import { analizarRuta } from './rutas';
 
-// El laboratorio incluye A-Frame (~1.5 MB): solo se descarga si se visita.
+// Páginas bajo demanda: la pantalla de inicio carga rápido.
+// El laboratorio incluye A-Frame (~1.3 MB): solo se descarga si se visita.
+const Curso = lazy(() => import('./pages/Curso'));
+const Leccion = lazy(() => import('./pages/Leccion'));
 const Laboratorio = lazy(() => import('./pages/Laboratorio'));
 
 function useRuta() {
-  const [ruta, setRuta] = useState(() => window.location.hash);
+  const [hash, setHash] = useState(() => window.location.hash);
   useEffect(() => {
-    const cambiar = () => setRuta(window.location.hash);
+    const cambiar = () => {
+      setHash(window.location.hash);
+      window.scrollTo({ top: 0 });
+    };
     window.addEventListener('hashchange', cambiar);
     return () => window.removeEventListener('hashchange', cambiar);
   }, []);
-  return ruta;
+  return analizarRuta(hash);
 }
 
 function Cargando() {
@@ -28,20 +36,31 @@ function Cargando() {
   );
 }
 
+function Pagina({ ruta }) {
+  switch (ruta.pagina) {
+    case 'curso':
+      return <Curso cursoId={ruta.cursoId} />;
+    case 'leccion':
+      return <Leccion cursoId={ruta.cursoId} leccionId={ruta.leccionId} />;
+    case 'laboratorio':
+      return <Laboratorio />;
+    default:
+      return <Inicio />;
+  }
+}
+
 function App() {
   const ruta = useRuta();
 
   return (
     <div className="min-h-screen">
       <FondoLowPoly />
-      <BarraSuperior />
-      {ruta === '#/laboratorio' ? (
+      <ProgresoProvider>
+        <BarraSuperior />
         <Suspense fallback={<Cargando />}>
-          <Laboratorio />
+          <Pagina ruta={ruta} />
         </Suspense>
-      ) : (
-        <Inicio />
-      )}
+      </ProgresoProvider>
     </div>
   );
 }

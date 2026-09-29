@@ -2,26 +2,23 @@
 // Esta página se carga bajo demanda, así A-Frame no pesa en la pantalla de inicio.
 import 'aframe';
 import { useEffect, useState } from 'react';
-import { checkBackendStatus, iniciarSesionBD } from '../services/api';
+import { API_URL, consultarSalud, iniciarSesionBD } from '../services/api';
 
 function Laboratorio() {
-  const [status, setStatus] = useState("Conectando...");
-  const [online, setOnline] = useState(false);
+  const [salud, setSalud] = useState(null);
   const [sesionActiva, setSesionActiva] = useState(null);
   const [errorSesion, setErrorSesion] = useState(false);
 
   useEffect(() => {
-    const fetchStatus = async () => {
-      const data = await checkBackendStatus();
-      if (data && data.estado && data.estado !== "Desconectado") {
-        setOnline(true);
-        setStatus("Oracle: Conectado");
-      } else {
-        setStatus("Oracle: Desconectado");
-      }
-    };
-    fetchStatus();
+    consultarSalud().then(setSalud);
   }, []);
+
+  let status = "Conectando...";
+  if (salud) {
+    if (!salud.backend) status = "Backend: sin respuesta";
+    else status = salud.baseDatos ? `Base de datos: conectada (${salud.detalle})` : "Backend activo · base de datos con error";
+  }
+  const online = Boolean(salud?.baseDatos);
 
   const handleCrearSesion = async () => {
     // Simulamos un correo de un alumno
@@ -54,6 +51,11 @@ function Laboratorio() {
           {status}
         </span>
       </div>
+
+      <p className="font-mono text-xs text-white/40">
+        Backend: {API_URL}
+        {salud?.detalle && !salud.baseDatos && <span className="block text-red-400">{salud.detalle}</span>}
+      </p>
 
       <div className="flex flex-col gap-4 lg:flex-row">
         <aside className="corte-poly flex flex-col gap-4 bg-superficie p-4 lg:w-1/4">

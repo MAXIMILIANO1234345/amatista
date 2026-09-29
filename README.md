@@ -128,14 +128,18 @@ El backend y la inteligencia artificial deben ampliar la experiencia, no convert
 amatista/
 │
 ├── frontend/
-│   ├── public/
-│   ├── src/
+│   ├── public/            # íconos e ilustraciones
+│   ├── scripts/           # generador de ilustraciones low poly
+│   ├── src/               # app React (ver frontend/README.md)
 │   ├── package.json
 │   └── vite.config.js
 │
 ├── backend/
-│   ├── api/
-│   ├── database/
+│   ├── api/               # rutas: sesiones y progreso
+│   ├── database/          # conexión (Oracle o SQLite) y modelos
+│   ├── sql/               # esquema de Oracle
+│   ├── tests/
+│   ├── diagnostico_oracle.py
 │   ├── main.py
 │   └── requirements.txt
 │
@@ -182,7 +186,7 @@ El frontend representa el núcleo de la experiencia del estudiante.
 - Comunicación con backend.
 - Comunicación con Tutor IA.
 
-Actualmente existe un **App Shell inicial** con React y una escena A-Frame integrada.
+Hoy la PWA tiene la pantalla de cursos, el mapa de cada módulo, el reproductor de lecciones (lecturas, tarjetas interactivas, código con vista 3D en vivo y exámenes) y el progreso con XP e insignias. El formato de las lecciones está en `docs/arquitectura/2026-09-29_formato-lecciones.txt`.
 
 ---
 
@@ -265,7 +269,7 @@ El backend tendrá responsabilidades como:
 - metadatos;
 - comunicación con servicios externos.
 
-El desarrollo del backend se encuentra actualmente **en proceso de integración al repositorio principal**.
+El código del backend ya está en `backend/`. Cómo ejecutarlo, probarlo y dejar Oracle funcionando: `backend/README.md`.
 
 ---
 
@@ -281,11 +285,7 @@ progreso_lecciones
 
 La intención es mantener inicialmente una estructura sencilla y expandirla únicamente cuando las funcionalidades del producto lo requieran.
 
-La información técnica sobre la conexión y arquitectura de Oracle se encuentra documentada dentro de:
-
-```text
-docs/arquitectura/2026-09-27_backend_y_base_de_datos.txt
-```
+El esquema oficial está en `backend/sql/001_esquema_amatista.sql`: todos los identificadores de usuario son texto (`VARCHAR2`), así caben correos y UUID. El historial de la conexión con Oracle está en `docs/arquitectura/2026-09-27_backend_y_base_de_datos.txt` y el diagnóstico de los errores ORA en `docs/incidencias/2026-09-29_diagnostico-oracle-progreso.txt`.
 
 ---
 
@@ -376,17 +376,17 @@ Amatista se encuentra actualmente en una etapa temprana de desarrollo.
 - [x] Convención de commits.
 - [x] Arquitectura de backend y base de datos documentada.
 - [x] Plantilla de variables de entorno.
+- [x] Módulo 1 de Blender y de A-Frame con lecciones ilustradas y examen.
+- [x] Ruta de aprendizaje con lecciones que se desbloquean.
+- [x] Progreso local en IndexedDB con XP e insignias.
+- [x] Sincronización del progreso con el backend.
+- [x] API FastAPI en el repositorio, con pruebas.
 
 ### En desarrollo
 
-- [ ] IndexedDB.
-- [ ] Gestión de contenido offline.
-- [ ] Sistema de lecciones.
-- [ ] Ruta de aprendizaje.
-- [ ] Progreso local.
-- [ ] API FastAPI.
-- [ ] Integración de Oracle.
-- [ ] Sincronización frontend/backend.
+- [ ] Integración de Oracle con el esquema nuevo (pendiente en el servidor).
+- [ ] Autenticación de alumnos.
+- [ ] Módulos 2 a 4 de cada curso.
 - [ ] Integración del Tutor IA.
 - [ ] Carga dinámica de modelos GLB.
 - [ ] Experiencias WebXR completas.
@@ -483,20 +483,12 @@ npm run build
 El repositorio incluye:
 
 ```text
-.env.example
+backend/.env.example     # Oracle (o SQLite para desarrollo) y CORS
+frontend/.env.example    # VITE_API_URL: dirección del backend
+.env.example             # Tutor IA (Ollama)
 ```
 
-Este archivo sirve como referencia para configurar los servicios externos.
-
-Ejemplo:
-
-```env
-DB_USER=
-DB_PASSWORD=
-DB_HOST=
-
-OLLAMA_URL=http://localhost:11434
-```
+Cada uno se copia sin el `.example` y se completa con los valores reales.
 
 > Nunca deben publicarse contraseñas, tokens, wallets, claves privadas o credenciales reales dentro del repositorio.
 

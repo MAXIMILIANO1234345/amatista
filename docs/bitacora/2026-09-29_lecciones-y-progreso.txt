@@ -1,0 +1,66 @@
+=============================================================================
+BITÁCORA: PRIMERAS LECCIONES, PROGRESO Y BACKEND EN EL REPOSITORIO
+PROYECTO: AMATISTA PWA
+FECHA: 29 DE SEPTIEMBRE DE 2026 (UTC-6)
+=============================================================================
+
+1. LO QUE SE HIZO CON ÉXITO
+-----------------------------------------------------------------------------
+[OK] Módulo 1 de los dos cursos, con el contenido entregado por el equipo:
+     - Blender: "El mundo 3D y la magia de Blender" (3 lecciones + examen).
+     - A-Frame: "La web en 3D" (2 lecciones + examen). El curso de A-Frame
+       pasa de "bloqueado" a "disponible".
+
+[OK] Reproductor de lecciones estilo videojuego:
+     - Mapa del módulo: cada lección se desbloquea al completar la anterior.
+     - Tarjetas de concepto que se voltean (hay que descubrirlas todas).
+     - Línea de tiempo, pipeline ilustrado y capas de A-Frame.
+     - Editor de código con vista 3D en vivo de A-Frame (la escena se
+       reutiliza y el código se filtra: solo etiquetas <a-…>, sin eventos).
+     - Examen con retroalimentación por pregunta, opciones que cambian de
+       orden en cada intento, XP e insignia al aprobar.
+
+[OK] Ilustraciones low poly (SVG generados con npm run ilustraciones):
+     historia de Blender, malla, materiales, render y navegador WebXR.
+     Pesan 150 KB en total y funcionan sin conexión.
+
+[OK] Progreso "local primero": se guarda en el dispositivo (IndexedDB), da
+     XP y se sincroniza con /api/progreso cuando el servidor responde.
+
+[OK] Backend en el repositorio (antes solo vivía en el servidor):
+     FastAPI + SQLAlchemy, script SQL limpio para Oracle, script de
+     diagnóstico y 14 pruebas automáticas.
+
+2. FALLOS E INCIDENCIAS
+-----------------------------------------------------------------------------
+[DIAGNOSTICADO] Oracle no guardaba sesiones (ORA-00942, ORA-01722, ORA-02267).
+     Causa: la tabla SESIONES_WEB no existe y el esquema mezcla dos diseños
+     de ID. Ver incidencias/2026-09-29_diagnostico-oracle-progreso.txt.
+     Pendiente: ejecutar el script SQL y el diagnóstico en el servidor.
+
+[CAMBIO] La lección "El Pipeline" tenía un video con una URL de ejemplo
+     (cdn.plataforma.edu) que no existe. Se reemplazó por una ilustración de
+     los 6 pasos. Cuando haya un video real se puede volver a agregar.
+
+[CORREGIDO] Durante las pruebas: un ícono SVG inválido (error de consola) y
+     el editor partía las líneas largas de código.
+
+3. VERIFICACIÓN
+-----------------------------------------------------------------------------
+Prueba de punta a punta en Chromium, con el backend local en SQLite:
+  - Curso de Blender completo: bloqueo de lecciones, tarjetas, examen
+    reprobado (67 %) y luego aprobado (100 %), 500 XP e insignia.
+  - El progreso sobrevive a recargar la página.
+  - El backend recibió las 4 lecciones (examen: 100 % en 2 intentos).
+  - Vista 3D: al editar el color de la caja a azul, se actualiza en la
+    misma escena. Un onclick o un <script> no llegan a la escena.
+  - Sin conexión: lecciones, ilustraciones y vista 3D funcionan.
+  - Móvil (390 px): sin desbordamiento horizontal. Sin errores de consola.
+
+4. SIGUIENTES PASOS
+-----------------------------------------------------------------------------
+  1. En el servidor: seguir backend/README.md y confirmar /api/salud.
+  2. Autenticación: hoy el alumno es un id anónimo del dispositivo.
+  3. Módulo 2 de cada curso (formato en arquitectura/2026-09-29_formato-lecciones.txt).
+  4. HTTPS en el backend antes de publicar en Cloudflare Pages.
+=============================================================================

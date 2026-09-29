@@ -1,0 +1,173 @@
+{
+  "module": {
+    "id": "mod_aframe_001",
+    "courseId": "crs_aframe_fundamentos",
+    "title": "Módulo 1: La Web en 3D (Tus primeros pasos en A-Frame)",
+    "slug": "modulo-1-fundamentos-aframe",
+    "description": "Descubre cómo la web ha evolucionado. Aprenderemos qué es WebXR y cómo A-Frame nos permite construir experiencias de Realidad Virtual directamente en el navegador usando etiquetas que ya conoces.",
+    "estimatedTimeMinutes": 40,
+    "order": 1,
+    "lessons": [
+      {
+        "id": "les_af_001",
+        "title": "¿Qué es A-Frame y el WebXR?",
+        "slug": "que-es-aframe",
+        "type": "theory_reading",
+        "durationSeconds": 300,
+        "isLocked": false,
+        "contentBlocks": [
+          {
+            "type": "markdown_text",
+            "body": "### El 3D llega al navegador\nTradicionalmente, para experimentar Realidad Virtual (VR) necesitabas descargar aplicaciones pesadas. **WebXR** es la tecnología que permite que tu navegador (Chrome, Firefox, Safari) renderice mundos 3D usando la tarjeta gráfica de tu computadora o celular."
+          },
+          {
+            "type": "markdown_text",
+            "body": "### Entra A-Frame\nA-Frame es un *framework* de código abierto mantenido por Supermedium (y originalmente por Mozilla). Su magia radica en que envuelve la complejidad de tecnologías como WebGL en simples etiquetas web. No necesitas compilar nada complejo; todo corre en el navegador."
+          },
+          {
+            "type": "layers",
+            "title": "¿Qué pasa por dentro?",
+            "items": [
+              {
+                "title": "Tu HTML",
+                "text": "Lo que tú escribes: <a-scene>, <a-box>, <a-sphere>…"
+              },
+              {
+                "title": "A-Frame",
+                "text": "Convierte tus etiquetas en objetos 3D."
+              },
+              {
+                "title": "three.js",
+                "text": "El motor 3D en JavaScript que A-Frame usa por dentro."
+              },
+              {
+                "title": "WebGL",
+                "text": "Permite al navegador dibujar con la tarjeta gráfica."
+              },
+              {
+                "title": "GPU",
+                "text": "La tarjeta gráfica pinta cada cuadro en pantalla."
+              }
+            ],
+            "footer": "WebXR se suma a esta cadena para mostrar la escena en visores de realidad virtual y en realidad aumentada."
+          }
+        ],
+        "cover": {
+          "src": "ilustraciones/aframe-webxr.svg",
+          "alt": "Una ventana de navegador con un mundo 3D low poly y un visor de realidad virtual enfrente."
+        }
+      },
+      {
+        "id": "les_af_002",
+        "title": "El 'Hola Mundo' en Realidad Virtual",
+        "slug": "hola-mundo-aframe",
+        "type": "code_interactive",
+        "durationSeconds": 480,
+        "isLocked": true,
+        "contentBlocks": [
+          {
+            "type": "markdown_text",
+            "body": "A-Frame utiliza una estructura basada en el DOM (Document Object Model). Todo comienza importando la librería en el `<head>` y abriendo una etiqueta `<a-scene>` en el `<body>`. Dentro de la escena, colocamos **primitivas**."
+          },
+          {
+            "type": "code_snippet",
+            "language": "html",
+            "code": "<html>\n  <head>\n    <script src=\"https://aframe.io/releases/1.4.0/aframe.min.js\"></script>\n  </head>\n  <body>\n    <a-scene>\n      <a-box position=\"-1 0.5 -3\" rotation=\"0 45 0\" color=\"#4CC3D9\"></a-box>\n      <a-sphere position=\"0 1.25 -5\" radius=\"1.25\" color=\"#EF2D5E\"></a-sphere>\n      <a-cylinder position=\"1 0.75 -3\" radius=\"0.5\" height=\"1.5\" color=\"#FFC65D\"></a-cylinder>\n      <a-plane position=\"0 0 -4\" rotation=\"-90 0 0\" width=\"4\" height=\"4\" color=\"#7BC8A4\"></a-plane>\n      <a-sky color=\"#ECECEC\"></a-sky>\n    </a-scene>\n  </body>\n</html>",
+            "preview": true
+          },
+          {
+            "type": "markdown_text",
+            "body": "Fíjate en las etiquetas: `<a-box>` para un cubo, `<a-sphere>` para una esfera. Atributos como `position`, `rotation` y `color` controlan cómo y dónde se renderiza el objeto en el espacio 3D."
+          },
+          {
+            "type": "callout",
+            "variant": "reto",
+            "title": "Reto",
+            "body": "Pulsa **Editar**, cambia el `color` de la `<a-box>` a `blue` y ejecuta de nuevo. Después prueba mover la esfera con `position=\"0 2 -5\"`."
+          }
+        ]
+      },
+      {
+        "id": "les_af_003",
+        "title": "Prueba de Progreso: Conceptos Base",
+        "slug": "examen-progreso-aframe",
+        "type": "exam",
+        "isLocked": true,
+        "quizData": {
+          "passingScore": 100,
+          "questions": [
+            {
+              "id": "q_af_01",
+              "questionText": "¿Qué lenguaje de marcado utiliza A-Frame como base para estructurar las escenas 3D?",
+              "options": [
+                {
+                  "id": "opt_a",
+                  "text": "Python",
+                  "isCorrect": false
+                },
+                {
+                  "id": "opt_b",
+                  "text": "HTML",
+                  "isCorrect": true
+                },
+                {
+                  "id": "opt_c",
+                  "text": "C++",
+                  "isCorrect": false
+                }
+              ],
+              "feedbackCorrect": "¡Correcto! A-Frame extiende el HTML estándar, permitiéndote usar etiquetas personalizadas directamente en el DOM.",
+              "feedbackIncorrect": "Revisa el código de la lección anterior. A-Frame se integra directamente en la estructura básica de una página web."
+            },
+            {
+              "id": "q_af_02",
+              "questionText": "¿Cuál es la etiqueta principal y obligatoria que debe envolver a todos los objetos 3D en A-Frame?",
+              "options": [
+                {
+                  "id": "opt_a",
+                  "text": "<a-scene>",
+                  "isCorrect": true
+                },
+                {
+                  "id": "opt_b",
+                  "text": "<a-world>",
+                  "isCorrect": false
+                },
+                {
+                  "id": "opt_c",
+                  "text": "<body>",
+                  "isCorrect": false
+                }
+              ],
+              "feedbackCorrect": "¡Exacto! `<a-scene>` inicializa el motor 3D, la cámara, las luces y el entorno virtual.",
+              "feedbackIncorrect": "Casi. Aunque va dentro del `<body>`, hay una etiqueta específica de A-Frame que crea el 'contenedor' del mundo 3D."
+            },
+            {
+              "id": "q_af_03",
+              "questionText": "Si quisieras agregar un cubo azul en tu entorno virtual, ¿qué primitiva usarías?",
+              "options": [
+                {
+                  "id": "opt_a",
+                  "text": "<a-square color=\"blue\">",
+                  "isCorrect": false
+                },
+                {
+                  "id": "opt_b",
+                  "text": "<a-box color=\"blue\">",
+                  "isCorrect": true
+                },
+                {
+                  "id": "opt_c",
+                  "text": "<a-cube color=\"blue\">",
+                  "isCorrect": false
+                }
+              ],
+              "feedbackCorrect": "¡Correcto! A-Frame utiliza `<a-box>` para crear geometrías de caja o cubo.",
+              "feedbackIncorrect": "Revisa detenidamente el 'Hola Mundo'. A-Frame usa un nombre específico para las formas cúbicas."
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
