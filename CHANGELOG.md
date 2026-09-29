@@ -9,6 +9,10 @@ Todas las versiones de Amatista. Formato basado en [Keep a Changelog](https://ke
 - La bitácora del 27/09 se fechó en hora local (UTC-6).
 
 ### Agregado
+- Identidad visual low poly estilo videojuego y pantalla de inicio "Elige tu curso" (Blender disponible, A-Frame bloqueado).
+- PWA instalable: manifest, íconos y service worker con `vite-plugin-pwa`. La pantalla de cursos funciona sin conexión.
+- A-Frame y las fuentes (Outfit, JetBrains Mono) instalados con npm en lugar de CDN.
+- Laboratorio técnico en `#/laboratorio`: el panel de Oracle y el visor A-Frame se cargan bajo demanda.
 - `CHANGELOG.md` y política de tags de versión.
 - Investigación sobre cómo avanza el desarrollo (`docs/bitacora/2026-09-27_investigacion_desarrollo.txt`).
 
