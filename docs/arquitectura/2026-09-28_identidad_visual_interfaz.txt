@@ -1,0 +1,63 @@
+=============================================================================
+IDENTIDAD VISUAL E INTERFAZ: PANTALLA "ELIGE TU CURSO"
+PROYECTO: AMATISTA PWA
+FECHA: 28 DE SEPTIEMBRE DE 2026 (UTC-6)
+=============================================================================
+
+1. CONCEPTO
+-----------------------------------------------------------------------------
+"Cristal de amatista low poly" llevado a una interfaz de videojuego:
+la primera pantalla funciona como una selección de nivel. El alumno ve
+los cursos como mundos: uno disponible y otro bloqueado hasta terminar
+el anterior.
+
+2. ELEMENTOS DE LA IDENTIDAD
+-----------------------------------------------------------------------------
+- Logo: cristal de amatista de 6 caras planas con una línea neón en el
+  filo (public/icons/amatista.svg). Es también el ícono de la app.
+- Fondo: malla de triángulos generada en código con semilla fija
+  (FondoLowPoly.jsx). Morado cerca de la esquina superior derecha,
+  negro hacia abajo. No es una imagen: no pesa ni se descarga.
+- Tarjetas y botones con esquinas cortadas en diagonal (.corte-poly).
+- Hexágonos para los números de módulo y el marco de los íconos.
+- Íconos de cursos low poly: cubo facetado (Blender) y visor VR (A-Frame).
+  No se usan logotipos oficiales de terceros.
+- Colores (sobre la paleta del 27/09):
+    Base #121212 · Superficie #1E1E1E · Amatista #9B59B6
+    Amatista claro #C39BD3 · Neón #00E5FF · Texto #E0E0E0
+    Naranja Blender #F5792A (acento del curso de Blender)
+- Tipografía: Outfit (interfaz) y JetBrains Mono (etiquetas tipo HUD).
+- Animaciones suaves (flotar, pulso, entrada) que se desactivan si el
+  sistema pide reducir movimiento.
+
+3. PANTALLA DE INICIO
+-----------------------------------------------------------------------------
+- Barra superior: logo, estado de conexión (En línea / Sin conexión) y
+  botón "Instalar app" cuando el navegador lo permite.
+- Encabezado "Elige tu curso" y el flujo Blender > GLB > A-Frame > WebXR.
+- Curso 01 Blender (disponible): 4 módulos, progreso 0/4 y botón
+  "Comenzar". Como las lecciones aún no existen, el botón lo avisa y
+  enlaza a la descarga gratuita de Blender.
+- Curso 02 A-Frame (bloqueado): "Se desbloquea al terminar Blender".
+- Pie: enlace al Laboratorio técnico (#/laboratorio), que conserva el
+  panel de Oracle, la prueba de sesiones y el visor A-Frame.
+
+4. DECISIONES DE PWA Y RENDIMIENTO
+-----------------------------------------------------------------------------
+- vite-plugin-pwa genera el manifest y el service worker.
+- Precache de ~380 KB: HTML, JS, CSS, íconos y fuentes latinas. Después
+  de la primera visita, la pantalla de cursos abre sin Internet.
+- A-Frame (~1.3 MB) ya no se carga desde CDN en todas las páginas: está
+  en el chunk del laboratorio, se descarga solo al entrar ahí y se
+  guarda para usarlo sin conexión después.
+- Fuentes empaquetadas con npm (@fontsource-variable), sin Google Fonts.
+- Los cursos viven en src/data/cursos.js; después vendrán del backend
+  y se guardarán en IndexedDB.
+
+5. VERIFICACIÓN
+-----------------------------------------------------------------------------
+Probado con Chromium (Playwright) sobre el build de producción:
+- Escritorio 1440 px y móvil 390 px sin desbordamiento horizontal.
+- Recarga sin conexión: la pantalla de cursos y las fuentes cargan.
+- El laboratorio carga A-Frame bajo demanda sin errores en consola.
+=============================================================================

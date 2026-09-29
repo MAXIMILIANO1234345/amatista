@@ -3,24 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Amatista | React + WebXR</title>
-    
-    <!-- Configuración PWA -->
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#121212">
-    
-    <!-- Motor 3D -->
-    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <title>Amatista · Aprende 3D para la web</title>
+    <meta name="description" content="Plataforma offline-first para aprender creación 3D: Blender, A-Frame y WebXR." />
+    <meta name="theme-color" content="#121212" />
+    <link rel="icon" href="/icons/amatista.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
   </head>
-  <body class="bg-[#121212] text-[#E0E0E0] m-0">
+  <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js');
-            });
-        }
-    </script>
   </body>
 </html>

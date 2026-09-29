@@ -10,8 +10,16 @@ export default {
         'base': '#121212',
         'superficie': '#1E1E1E',
         'amatista': '#9B59B6',
-        'neon': '#00E5FF'
-      }
+        'amatista-claro': '#C39BD3',
+        'amatista-oscuro': '#3D1F52',
+        'neon': '#00E5FF',
+        'texto': '#E0E0E0',
+        'blender': '#F5792A',
+      },
+      fontFamily: {
+        sans: ['"Outfit Variable"', 'system-ui', 'sans-serif'],
+        mono: ['"JetBrains Mono Variable"', 'ui-monospace', 'monospace'],
+      },
     },
   },
   plugins: [],

@@ -367,6 +367,9 @@ Amatista se encuentra actualmente en una etapa temprana de desarrollo.
 - [x] Configuración inicial de Tailwind CSS.
 - [x] App Shell inicial.
 - [x] Integración básica de A-Frame.
+- [x] Identidad visual low poly y pantalla de selección de cursos.
+- [x] Manifest PWA funcional (app instalable).
+- [x] Service Worker con precache de la pantalla de cursos.
 - [x] Visor 3D inicial.
 - [x] Identidad visual base.
 - [x] Arquitectura general documentada.
@@ -376,8 +379,6 @@ Amatista se encuentra actualmente en una etapa temprana de desarrollo.
 
 ### En desarrollo
 
-- [ ] Manifest PWA funcional.
-- [ ] Service Worker.
 - [ ] IndexedDB.
 - [ ] Gestión de contenido offline.
 - [ ] Sistema de lecciones.
